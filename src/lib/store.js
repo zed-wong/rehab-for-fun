@@ -59,6 +59,12 @@ export const deletePatient = (id) => {
   showToast('患者已删除', 'warning');
 };
 
+export const clearAllPatients = () => {
+  patients.set([]);
+  selectedPatientId.set(null);
+  showToast('所有患者已清空', 'warning');
+};
+
 // --- Schedule Actions ---
 
 // Helper to get time + minutes

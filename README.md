@@ -1,43 +1,63 @@
-# Svelte + Vite
+# Rehab Daily
 
-This template should help get you started developing with Svelte in Vite.
+A daily rehabilitation schedule management application designed to help therapists and staff organize patient appointments and treatments efficiently.
 
-## Recommended IDE Setup
+## Features
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+- **Daily Schedule View**: A clear, interactive grid to view and manage patient slots for the day.
+- **Patient Management**:
+    - Add, edit, and delete patient records.
+    - Store contact information, treatment frequency, and other details.
+    - Quick-access "Patient Palette" for easy scheduling.
+- **Smart Scheduling Tools**:
+    - **Copy Yesterday**: Quickly replicate the previous day's schedule to save time.
+    - **Clear Day**: Reset the current day's schedule with a single click.
+- **Data Portability**: Import and export patient data (JSON format) to share or backup.
+- **Mobile-First Design**: Optimized for mobile devices with a clean, responsive interface using DaisyUI.
 
-## Need an official Svelte framework?
+## Tech Stack
 
-Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
+- **Frontend Framework**: [Svelte 5](https://svelte.dev/)
+- **Build Tool**: [Vite](https://vitejs.dev/)
+- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/) & [DaisyUI 5](https://daisyui.com/) (Winter Theme)
 
-## Technical considerations
+## Getting Started
 
-**Why use this over SvelteKit?**
+### Prerequisites
 
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
+- Node.js (Latest LTS recommended)
+- npm or bun
 
-This template contains as little as possible to get started with Vite + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
+### Installation
 
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd rehab-daily
+   ```
 
-**Why include `.vscode/extensions.json`?**
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
-**Why enable `checkJs` in the JS template?**
+4. Open your browser and navigate to `http://localhost:5173` (or the port shown in your terminal).
 
-It is likely that most cases of changing variable types in runtime are likely to be accidental, rather than deliberate. This provides advanced typechecking out of the box. Should you like to take advantage of the dynamically-typed nature of JavaScript, it is trivial to change the configuration.
+## Usage
 
-**Why is HMR not preserving my local component state?**
+- **Navigation**: Use the header sidebar (hamburger menu) to access global actions like "Copy Yesterday" or "Clear Today".
+- **Adding Patients**: Use the "+" button in the Patient Palette to register new patients.
+- **Scheduling**: Assign patients to specific time slots in the grid.
+- **Exporting/Importing**: Use the provided tools in the patient list to backup your patient list or migrate data.
 
-HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/sveltejs/svelte-hmr/tree/master/packages/svelte-hmr#preservation-of-local-state).
+## Project Structure
 
-If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
-
-```js
-// store.js
-// An extremely simple external store
-import { writable } from 'svelte/store'
-export default writable(0)
-```
+- `src/App.svelte`: Main application component and layout.
+- `src/components/`: Reusable UI components (Header, ScheduleGrid, PatientPalette).
+- `src/components/modals/`: Modal dialogs for forms and details.
+- `src/lib/store.js`: State management, data persistence, and utility logic.
