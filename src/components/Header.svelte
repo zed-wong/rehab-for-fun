@@ -70,7 +70,14 @@
       type="date"
       value={$currentDate}
       on:change={handleDateChange}
-      class="absolute inset-0 opacity-0 cursor-pointer w-full"
+      on:click={(e) => {
+        try {
+          e.target.showPicker();
+        } catch (error) {
+          // Fallback or ignore if not supported
+        }
+      }}
+      class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
     />
   </div>
 
