@@ -25,7 +25,8 @@
     const q = searchQuery.toLowerCase();
     return (
       p.name.toLowerCase().includes(q) ||
-      (p.type && p.type.toLowerCase().includes(q))
+      (p.type && p.type.toLowerCase().includes(q)) ||
+      (p.contact && p.contact.toLowerCase().includes(q))
     );
   });
 
@@ -69,7 +70,7 @@
       if (!Array.isArray(parsed)) throw new Error("Format error");
 
       // Basic validation: check if items have name
-      if (parsed.some((p) => !p.name)) throw new Error("Invalid data");
+      if (parsed.some((p) => !p.name)) throw new Error("无效数据");
 
       // Merge strategy: Overwrite matching IDs, append new ones.
       // Actually, user might want to merge lists.
@@ -242,7 +243,10 @@
                   {/if}
                 </div>
                 <div class="text-xs text-base-content/60 truncate">
-                  {p.type || "无诊断"} • {p.duration || 30}分钟默认
+                  {p.type || "无诊断"}
+                  {#if p.contact}
+                    • {p.contact}{/if}
+                  • {p.duration || 30}分钟默认
                 </div>
               </div>
 

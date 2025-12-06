@@ -85,7 +85,7 @@
                   <span
                     class="font-bold text-sm text-base-content leading-tight"
                   >
-                    {patient?.name || "Unknown"}
+                    {patient?.name || "未知"}
                   </span>
                   {#if patient?.type}
                     <span
@@ -103,7 +103,7 @@
           <button
             class="w-full h-full rounded-md border border-base-200 border-dashed transition-all flex items-center justify-center relative overflow-hidden group/btn"
             on:click={() => handleSlotClick(time, null)}
-            aria-label="Assign to {time}"
+            aria-label="分配给 {time}"
           >
             <!-- Default state: faint line -->
             <div

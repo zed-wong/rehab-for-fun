@@ -10,6 +10,8 @@
   let duration = 30;
   let color = "bg-blue-500";
   let category = "Inpatient"; // Default
+  let contact = "";
+  let frequency = "";
 
   // React to opening with data
   $: if (isOpen && patientToEdit) {
@@ -18,17 +20,19 @@
     duration = patientToEdit.duration;
     color = patientToEdit.color;
     category = patientToEdit.category || "Inpatient";
+    contact = patientToEdit.contact || "";
+    frequency = patientToEdit.frequency || "";
   } else if (isOpen && !patientToEdit) {
     reset();
   }
 
   const colors = [
-    { label: "Blue", val: "bg-blue-500" },
-    { label: "Green", val: "bg-emerald-500" },
-    { label: "Orange", val: "bg-amber-500" },
-    { label: "Red", val: "bg-rose-500" },
-    { label: "Purple", val: "bg-violet-500" },
-    { label: "Slate", val: "bg-slate-500" },
+    { label: "蓝色", val: "bg-blue-500" },
+    { label: "绿色", val: "bg-emerald-500" },
+    { label: "橙色", val: "bg-amber-500" },
+    { label: "红色", val: "bg-rose-500" },
+    { label: "紫色", val: "bg-violet-500" },
+    { label: "灰色", val: "bg-slate-500" },
   ];
 
   const handleSubmit = () => {
@@ -41,16 +45,18 @@
         duration,
         color,
         category,
+        contact,
+        frequency,
       });
     } else {
-      addPatient({ name, type, duration, color, category });
+      addPatient({ name, type, duration, color, category, contact, frequency });
     }
 
     onClose();
   };
 
   const handleDelete = () => {
-    if (confirm("Delete this patient permanently?")) {
+    if (confirm("确定要永久删除此患者吗？")) {
       deletePatient(patientToEdit.id);
       onClose();
     }
@@ -62,6 +68,8 @@
     duration = 30;
     color = "bg-blue-500";
     category = "Inpatient";
+    contact = "";
+    frequency = "";
   };
 </script>
 
@@ -97,6 +105,28 @@
             type="text"
             bind:value={name}
             placeholder="例如：张伟"
+            class="input input-bordered w-full"
+          />
+        </div>
+
+        <!-- Contact (New) -->
+        <div class="form-control w-full">
+          <label class="label"><span class="label-text">联系方式</span></label>
+          <input
+            type="text"
+            bind:value={contact}
+            placeholder="电话号码或其他"
+            class="input input-bordered w-full"
+          />
+        </div>
+
+        <!-- Frequency (New) -->
+        <div class="form-control w-full">
+          <label class="label"><span class="label-text">日期/次数</span></label>
+          <input
+            type="text"
+            bind:value={frequency}
+            placeholder="例如：2025.12.07开了10次"
             class="input input-bordered w-full"
           />
         </div>

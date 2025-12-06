@@ -146,7 +146,7 @@
     <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"
     ></label>
     <ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
-      <li class="menu-title">菜单 (Menu)</li>
+      <li class="menu-title">菜单</li>
       <li>
         <button on:click={handleCopy} class="gap-4">
           {@html CopyIcon}
@@ -154,7 +154,7 @@
         </button>
       </li>
       <li>
-        <button on:click={handleClear} class="text-error gap-4">
+        <button on:click={handleClear} class="gap-4">
           {@html TrashIcon}
           清空今日安排
         </button>
