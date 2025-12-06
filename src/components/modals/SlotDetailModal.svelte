@@ -33,7 +33,7 @@
         <div>
           <h3 class="text-xl font-bold">{slotData.patient?.name}</h3>
           <p class="text-base-content/60 font-medium">
-            {slotData.patient?.type || "No details"}
+            {slotData.patient?.type || "无详情"}
           </p>
         </div>
 
@@ -43,7 +43,7 @@
             {@html ClockIcon}
             <span class="font-mono">{slotData.time}</span>
             <span>•</span>
-            <span>{slotData.slot.duration} min</span>
+            <span>{slotData.slot.duration} 分钟</span>
           </div>
         </div>
 
@@ -53,10 +53,10 @@
             class="btn btn-error btn-outline w-full"
             on:click={handleDelete}
           >
-            Remove from Schedule
+            删除预约
           </button>
           <button class="btn btn-ghost w-full" on:click={onClose}>
-            Close
+            关闭
           </button>
         </div>
       </div>

@@ -45,18 +45,18 @@ export const showToast = (message, type = 'info') => {
 // --- Patient Actions ---
 export const addPatient = (p) => {
   patients.update(list => [...list, { ...p, id: crypto.randomUUID() }]);
-  showToast('Patient added', 'success');
+  showToast('患者已添加', 'success');
 };
 
 export const updatePatient = (id, updates) => {
   patients.update(list => list.map(p => p.id === id ? { ...p, ...updates } : p));
-  showToast('Patient updated', 'success');
+  showToast('患者已更新', 'success');
 };
 
 export const deletePatient = (id) => {
   patients.update(list => list.filter(p => p.id !== id));
   selectedPatientId.update(curr => curr === id ? null : curr);
-  showToast('Patient deleted', 'warning');
+  showToast('患者已删除', 'warning');
 };
 
 // --- Schedule Actions ---
@@ -76,9 +76,13 @@ export const selectedDuration = writable(30);
 
 // ... (existing code)
 
+// ... (existing imports)
+
+// ...
+
 export const paintSlot = (time) => {
   const sPatientId = get(selectedPatientId);
-  if (!sPatientId) return showToast('Please select a patient first', 'error');
+  if (!sPatientId) return showToast('请先选择一个患者', 'error');
 
   const allPatients = get(patients);
   const patient = allPatients.find(p => p.id === sPatientId);
@@ -89,7 +93,7 @@ export const paintSlot = (time) => {
   const daySchedule = sch[date] || {};
 
   // Check availability
-  if (daySchedule[time]) return showToast('Slot already occupied', 'error');
+  if (daySchedule[time]) return showToast('该时间段已被占用', 'error');
 
   // Use selectedDuration if available, otherwise patient default, otherwise 30
   const duration = get(selectedDuration) || (parseInt(patient.duration) || 30);
@@ -102,7 +106,7 @@ export const paintSlot = (time) => {
     // Assuming strict 30 min slots.
 
     if (daySchedule[nextTime]) {
-      return showToast('Next slot is occupied (Needs 1h)', 'error');
+      return showToast('下一个时间段已被占用（需要1小时）', 'error');
     }
 
     // Commit
@@ -124,7 +128,7 @@ export const paintSlot = (time) => {
       }
     }));
   }
-  showToast('Scheduled successfully', 'success');
+  showToast('预约成功', 'success');
 };
 
 export const clearSlot = (date, time) => {
@@ -154,7 +158,16 @@ export const clearSlot = (date, time) => {
 
     return { ...s, [date]: day };
   });
-  showToast('Slot cleared', 'info');
+  showToast('已清除', 'info');
+};
+
+export const checkYesterdayData = () => {
+  const date = get(currentDate);
+  const d = new Date(date);
+  d.setDate(d.getDate() - 1);
+  const yesterday = d.toLocaleDateString('en-CA');
+  const allSch = get(schedule);
+  return !!allSch[yesterday];
 };
 
 export const copyYesterday = () => {
@@ -164,14 +177,24 @@ export const copyYesterday = () => {
   const yesterday = d.toLocaleDateString('en-CA');
 
   const allSch = get(schedule);
-  const msg = allSch[yesterday] ? 'Copied yesterday\'s schedule' : 'No data from yesterday';
-  const type = allSch[yesterday] ? 'success' : 'warning';
 
   if (allSch[yesterday]) {
     schedule.update(s => ({
       ...s,
       [date]: JSON.parse(JSON.stringify(allSch[yesterday])) // Deep copy
     }));
+    showToast('已复制昨日安排', 'success');
+  } else {
+    showToast('昨日无数据', 'warning');
   }
-  showToast(msg, type);
+};
+
+export const clearDay = () => {
+  const date = get(currentDate);
+  schedule.update(s => {
+    const newSch = { ...s };
+    delete newSch[date];
+    return newSch;
+  });
+  showToast('本日安排已清空', 'success');
 };

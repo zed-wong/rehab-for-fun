@@ -3,12 +3,14 @@
   import PatientPalette from "./components/PatientPalette.svelte";
   import ScheduleGrid from "./components/ScheduleGrid.svelte";
   import PatientFormModal from "./components/modals/PatientFormModal.svelte";
+  import PatientListModal from "./components/modals/PatientListModal.svelte";
   import SlotDetailModal from "./components/modals/SlotDetailModal.svelte";
   import { toasts } from "./lib/store";
   import { fly } from "svelte/transition";
 
   let showPatientModal = false;
   let showDetailModal = false;
+  let showListModal = false;
   let selectedSlotData = null;
   let editingPatientData = null;
 
@@ -34,6 +36,7 @@
   <PatientPalette
     on:openAddModal={handleOpenAdd}
     on:editPatient={handleEditPatient}
+    on:openShowAll={() => (showListModal = true)}
   />
 
   <main
@@ -47,6 +50,13 @@
     isOpen={showPatientModal}
     patientToEdit={editingPatientData}
     onClose={() => (showPatientModal = false)}
+  />
+
+  <PatientListModal
+    isOpen={showListModal}
+    onClose={() => (showListModal = false)}
+    on:editPatient={handleEditPatient}
+    on:addNew={handleOpenAdd}
   />
 
   <SlotDetailModal
