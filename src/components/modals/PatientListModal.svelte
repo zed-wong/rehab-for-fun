@@ -4,6 +4,7 @@
     selectedPatientId,
     selectedDuration,
     showToast,
+    clearAllPatients,
   } from "../../lib/store";
   import { createEventDispatcher, onMount } from "svelte";
   import { fade, fly } from "svelte/transition";
@@ -104,6 +105,13 @@
       showToast("导入失败: 格式错误", "error");
     }
   };
+
+  const handleClearAll = () => {
+    if (confirm("确定要清空所有患者数据吗？此操作无法撤销。")) {
+      clearAllPatients();
+      showToast("所有患者已清空", "success");
+    }
+  };
 </script>
 
 {#if isOpen}
@@ -161,6 +169,11 @@
                 <li><button on:click={handleExport}>导出数据</button></li>
                 <li>
                   <button on:click={() => (importMode = true)}>导入数据</button>
+                </li>
+                <li>
+                  <button on:click={handleClearAll} class="text-error"
+                    >清空所有患者</button
+                  >
                 </li>
               </ul>
             </div>

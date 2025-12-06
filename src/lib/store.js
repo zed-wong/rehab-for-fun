@@ -20,8 +20,8 @@ const persist = (key, store, defaultVal) => {
 
 // --- Stores ---
 export const patients = writable([
-  { id: 'p1', name: '张伟', type: '脑卒中', duration: 60, color: 'bg-blue-500' },
-  { id: 'p2', name: '李娜', type: '骨折术后', duration: 30, color: 'bg-emerald-500' }
+  { id: 'p1', name: '张伟', type: '脑卒中', duration: 30, color: 'bg-blue-500' },
+  { id: 'p2', name: '李娜', type: '骨折术后', duration: 60, color: 'bg-emerald-500' }
 ]);
 
 export const schedule = writable({});
@@ -102,7 +102,7 @@ export const paintSlot = (time) => {
   if (daySchedule[time]) return showToast('该时间段已被占用', 'error');
 
   // Use selectedDuration if available, otherwise patient default, otherwise 30
-  const duration = get(selectedDuration) || (parseInt(patient.duration) || 30);
+  const duration = get(selectedDuration) || (Number(patient.duration) || 30);
 
   // Logic for 60 mins (2 slots)
   if (duration === 60) {
