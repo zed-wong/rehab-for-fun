@@ -1,0 +1,23 @@
+{
+  "name": "康复日程助手",
+  "short_name": "康复日程",
+  "description": "Rehabilitation Patient Scheduling App",
+  "theme_color": "#ffffff",
+  "background_color": "#f8fafc",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/vite.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

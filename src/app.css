@@ -1,0 +1,13 @@
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  /* Prevent pull-to-refresh on mobile */
+  overscroll-behavior-y: none;
+}

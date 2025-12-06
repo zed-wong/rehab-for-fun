@@ -1,0 +1,21 @@
+{
+  "name": "rehab-daily",
+  "version": "0.0.0",
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^6.2.1",
+    "@tailwindcss/postcss": "^4.1.17",
+    "autoprefixer": "^10.4.22",
+    "daisyui": "^5.5.8",
+    "postcss": "^8.5.6",
+    "svelte": "^5.43.8",
+    "tailwindcss": "^4.1.17",
+    "vite": "^7.2.4"
+  },
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "type": "module"
+}
