@@ -12,6 +12,7 @@
   let category = "Inpatient"; // Default
   let contact = "";
   let frequency = "";
+  let price = 0;
 
   // React to opening with data
   $: if (isOpen && patientToEdit) {
@@ -22,6 +23,7 @@
     category = patientToEdit.category || "Inpatient";
     contact = patientToEdit.contact || "";
     frequency = patientToEdit.frequency || "";
+    price = patientToEdit.price || 0;
   } else if (isOpen && !patientToEdit) {
     reset();
   }
@@ -47,9 +49,19 @@
         category,
         contact,
         frequency,
+        price: Number(price),
       });
     } else {
-      addPatient({ name, type, duration, color, category, contact, frequency });
+      addPatient({
+        name,
+        type,
+        duration,
+        color,
+        category,
+        contact,
+        frequency,
+        price: Number(price),
+      });
     }
 
     onClose();
@@ -70,6 +82,7 @@
     category = "Inpatient";
     contact = "";
     frequency = "";
+    price = 0;
   };
 </script>
 
@@ -81,7 +94,7 @@
     tabindex="-1"
   >
     <div
-      class="card w-full max-w-sm bg-base-100 shadow-xl"
+      class="card w-full max-w-sm bg-base-100 shadow-xl max-h-[90vh] overflow-y-auto"
       on:click|stopPropagation
       role="dialog"
     >
@@ -116,6 +129,19 @@
             type="text"
             bind:value={contact}
             placeholder="电话号码或其他"
+            class="input input-bordered w-full"
+          />
+        </div>
+
+        <!-- Price (New) -->
+        <div class="form-control w-full">
+          <label class="label"
+            ><span class="label-text">单次费用 (元)</span></label
+          >
+          <input
+            type="number"
+            bind:value={price}
+            placeholder="0"
             class="input input-bordered w-full"
           />
         </div>
