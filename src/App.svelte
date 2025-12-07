@@ -6,6 +6,7 @@
   import PatientListModal from "./components/modals/PatientListModal.svelte";
   import SlotDetailModal from "./components/modals/SlotDetailModal.svelte";
   import PwaInstallModal from "./components/modals/PwaInstallModal.svelte";
+  import OnboardingModal from "./components/modals/OnboardingModal.svelte";
   import {
     toasts,
     copyYesterday,
@@ -21,6 +22,7 @@
   let showDetailModal = false;
   let showListModal = false;
   let showPwaModal = false;
+  let showOnboardingModal = false;
   let selectedSlotData = null;
   let editingPatientData = null;
   let listModalImportMode = false;
@@ -102,6 +104,11 @@
     showPwaModal = true;
   };
 
+  const handleOpenOnboarding = () => {
+    closeSidebar();
+    showOnboardingModal = true;
+  };
+
   // Icons for Sidebar
   const CopyIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`;
   const TrashIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>`;
@@ -109,6 +116,7 @@
   const ImportIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
   const UserMinusIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="23" y1="11" x2="17" y2="11"/></svg>`;
   const PhoneIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>`;
+  const BookIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`;
 </script>
 
 <div class="drawer">
@@ -158,6 +166,11 @@
     <PwaInstallModal
       isOpen={showPwaModal}
       onClose={() => (showPwaModal = false)}
+    />
+
+    <OnboardingModal
+      isOpen={showOnboardingModal}
+      onClose={() => (showOnboardingModal = false)}
     />
 
     <!-- Toast Container -->
@@ -222,6 +235,12 @@
 
       <div class="divider"></div>
       <li class="menu-title">应用</li>
+      <li>
+        <button on:click={handleOpenOnboarding} class="gap-4">
+          {@html BookIcon}
+          使用指南
+        </button>
+      </li>
       <li>
         <button on:click={handleOpenPwaHelp} class="gap-4">
           {@html PhoneIcon}

@@ -25,12 +25,47 @@
         </div>
 
         <div class="space-y-4">
+          <!-- Step 1: Open in Safari -->
           <div class="flex items-start gap-4">
             <div class="flex-none pt-1">
               <div
                 class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold"
               >
                 1
+              </div>
+            </div>
+            <div class="flex-1">
+              <p class="font-medium">在 Safari 浏览器打开</p>
+              <p class="text-sm text-base-content/70 mt-1">
+                请确保您正在使用 iPhone 自带的 Safari 浏览器访问本页面
+              </p>
+              <div class="mt-2 text-center p-2 bg-base-200 rounded">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="mx-auto text-primary"
+                  ><circle cx="12" cy="12" r="10" /><polygon
+                    points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"
+                  /></svg
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2: Share -->
+          <div class="flex items-start gap-4">
+            <div class="flex-none pt-1">
+              <div
+                class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold"
+              >
+                2
               </div>
             </div>
             <div class="flex-1">
@@ -63,12 +98,13 @@
             </div>
           </div>
 
+          <!-- Step 3: Add to Home Screen -->
           <div class="flex items-start gap-4">
             <div class="flex-none pt-1">
               <div
                 class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold"
               >
-                2
+                3
               </div>
             </div>
             <div class="flex-1">
@@ -106,12 +142,13 @@
             </div>
           </div>
 
+          <!-- Step 4: Add -->
           <div class="flex items-start gap-4">
             <div class="flex-none pt-1">
               <div
                 class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold"
               >
-                3
+                4
               </div>
             </div>
             <div class="flex-1">
