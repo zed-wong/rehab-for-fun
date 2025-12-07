@@ -178,19 +178,19 @@
               <input
                 type="radio"
                 bind:group={category}
-                value="Inpatient"
+                value="Outpatient"
                 class="radio radio-sm"
               />
-              <span class="label-text">住院</span>
+              <span class="label-text">门诊</span>
             </label>
             <label class="label cursor-pointer gap-2">
               <input
                 type="radio"
                 bind:group={category}
-                value="Outpatient"
+                value="Inpatient"
                 class="radio radio-sm"
               />
-              <span class="label-text">门诊</span>
+              <span class="label-text">住院</span>
             </label>
           </div>
         </div>
