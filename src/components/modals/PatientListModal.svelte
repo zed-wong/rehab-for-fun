@@ -58,7 +58,7 @@
   export let importMode = false;
   let importText = "";
   const importPlaceholder = `在此处粘贴导出的 JSON 数据...
-支持旧版(仅患者数组)和新版(患者+记录)格式`;
+支持仅患者和患者+记录格式`;
 
   const handleExport = () => {
     dispatch("openExport"); // Let parent App.svelte handle it via ExportModal
