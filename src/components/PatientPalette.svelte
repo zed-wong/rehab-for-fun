@@ -36,7 +36,9 @@
 <div
   class="sticky top-[3.5rem] z-40 bg-base-100/95 backdrop-blur border-b border-base-200"
 >
-  <div class="flex items-center gap-2 overflow-x-auto p-3 no-scrollbar snap-x">
+  <div
+    class="flex items-center gap-2 overflow-x-auto p-3 no-scrollbar snap-x ml-2"
+  >
     <!-- Add Button -->
     <button
       class="btn btn-sm btn-circle btn-ghost border border-base-200 text-base-content/70 hover:bg-base-200 shrink-0 snap-start"
