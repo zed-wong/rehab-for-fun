@@ -74,7 +74,10 @@
     try {
       const data = JSON.stringify($patients, null, 2);
       navigator.clipboard.writeText(data);
-      showToast("已复制所有患者数据到剪贴板", "success");
+      showToast(
+        "已复制患者数据到剪贴板，请将其粘贴保存，后续通过导入功能重新导入应用",
+        "success",
+      );
     } catch (e) {
       showToast("导出失败", "error");
     }
