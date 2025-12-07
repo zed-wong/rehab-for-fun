@@ -5,17 +5,27 @@
     patients,
     selectedPatientId,
     paintSlot,
+    scheduleSettings,
   } from "../lib/store";
   import { createEventDispatcher } from "svelte";
 
   const dispatch = createEventDispatcher();
 
-  // Generate 07:00 to 20:00
-  const timeSlots = [];
-  for (let h = 7; h <= 20; h++) {
-    const hh = h.toString().padStart(2, "0");
-    timeSlots.push(`${hh}:00`);
-    if (h < 20) timeSlots.push(`${hh}:30`);
+  // Generate slots based on settings
+  let timeSlots = [];
+  $: {
+    const { startHour, endHour, timeStep } = $scheduleSettings;
+    timeSlots = [];
+    let currentMins = startHour * 60;
+    const endMins = endHour * 60;
+
+    while (currentMins <= endMins) {
+      const h = Math.floor(currentMins / 60);
+      const m = currentMins % 60;
+      const timeStr = `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
+      timeSlots.push(timeStr);
+      currentMins += timeStep;
+    }
   }
 
   $: daySchedule = $schedule[$currentDate] || {};

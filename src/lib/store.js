@@ -84,13 +84,16 @@ const addMinutes = (time, mins) => {
 
 // ... (existing imports)
 
-export const selectedDuration = writable(30);
-
-// ... (existing code)
-
 // ... (existing imports)
 
-// ...
+export const selectedDuration = writable(30);
+
+export const scheduleSettings = writable({
+  startHour: 7,
+  endHour: 20,
+  timeStep: 30
+});
+persist('rehab_settings_v1', scheduleSettings, { startHour: 7, endHour: 20, timeStep: 30 });
 
 export const paintSlot = (time) => {
   const sPatientId = get(selectedPatientId);
@@ -104,69 +107,104 @@ export const paintSlot = (time) => {
   const sch = get(schedule);
   const daySchedule = sch[date] || {};
 
-  // Check availability
-  if (daySchedule[time]) return showToast('该时间段已被占用', 'error');
-
   // Use selectedDuration if available, otherwise patient default, otherwise 30
   const duration = get(selectedDuration) || (Number(patient.duration) || 30);
+  const { timeStep } = get(scheduleSettings);
 
-  // Logic for 60 mins (2 slots)
-  if (duration === 60) {
-    const nextTime = addMinutes(time, 30);
-    // We only support up to 20:00, so check bounds logic in component or here
-    // If nextTime is > 20:00 or whatever limit, we might block or allow.
-    // Assuming strict 30 min slots.
+  const slotsNeeded = Math.ceil(duration / timeStep);
+  const timesToReserve = [];
+  let checkTime = time;
 
-    if (daySchedule[nextTime]) {
-      return showToast('下一个时间段已被占用（需要1小时）', 'error');
+  // 1. Validation Phase
+  for (let i = 0; i < slotsNeeded; i++) {
+    if (daySchedule[checkTime]) {
+      return showToast(`时间段 ${checkTime} 已被占用`, 'error');
     }
+    // Optional: check bounds (e.g. beyond 20:00 or endHour)
+    // We'll skip bound check for now or rely on grid not showing them, 
+    // but reserving invisible slots is fine.
 
-    // Commit
-    schedule.update(s => ({
-      ...s,
-      [date]: {
-        ...(s[date] || {}),
-        [time]: { patientId: patient.id, isHead: true, duration: 60 },
-        [nextTime]: { patientId: patient.id, isHead: false, duration: 60, headTime: time }
-      }
-    }));
-  } else {
-    // 30 mins
-    schedule.update(s => ({
-      ...s,
-      [date]: {
-        ...(s[date] || {}),
-        [time]: { patientId: patient.id, isHead: true, duration: 30 }
-      }
-    }));
+    timesToReserve.push(checkTime);
+    checkTime = addMinutes(checkTime, timeStep);
   }
+
+  // 2. Commit Phase
+  schedule.update(s => {
+    const newDay = { ...(s[date] || {}) };
+
+    timesToReserve.forEach((t, index) => {
+      if (index === 0) {
+        newDay[t] = {
+          patientId: patient.id,
+          isHead: true,
+          duration: duration
+        };
+      } else {
+        newDay[t] = {
+          patientId: patient.id,
+          isHead: false,
+          duration: duration,
+          headTime: time
+        };
+      }
+    });
+
+    return { ...s, [date]: newDay };
+  });
+
   showToast('预约成功', 'success');
 };
 
 export const clearSlot = (date, time) => {
+  const { timeStep } = get(scheduleSettings);
+
   schedule.update(s => {
     const day = { ...(s[date] || {}) };
     const slot = day[time];
     if (!slot) return s;
 
-    // If it's a head of a multi-slot, we need to find the others. 
-    // Or if it's a tail, find the head.
-    // Simplification: We remove the clicked slot. 
-    // If the slot has a 'headTime' (it's a tail), we remove the head too.
-    // If the slot isHead and duration > 30, we remove the next slot too.
-
-    let slotsToRemove = [time];
-
-    if (slot.duration === 60) {
-      if (slot.isHead) {
-        const nextTime = addMinutes(time, 30);
-        slotsToRemove.push(nextTime);
-      } else if (slot.headTime) {
-        slotsToRemove.push(slot.headTime);
-      }
+    let headTime = time;
+    if (!slot.isHead && slot.headTime) {
+      headTime = slot.headTime;
     }
 
-    slotsToRemove.forEach(t => delete day[t]);
+    // Find the head slot to get duration
+    const headSlot = day[headTime];
+    if (!headSlot) {
+      // Orphaned tail? just delete current
+      delete day[time];
+      return { ...s, [date]: day };
+    }
+
+    // Calculate how many slots this patient takes
+    // Note: If we changed settings after booking, this might be tricky.
+    // Ideally we assume the slot structure is consistent with current settings OR 
+    // we trace forward using duration.
+    // If duration is stored, we can calculate slots.
+
+    // Better approach: Calculate slots based on duration and CURRENT timeStep? 
+    // No, if I booked 60 mins on 30 min step (2 slots). Now step is 60.
+    // head (00:00). Next is 01:00.
+    // 00:30 is "hidden" in grid but exists in data.
+    // We should delete based on DURATION.
+
+    // Actually, we can just walk forward from headTime by original step size? No we don't know it.
+    // But we know standard steps are 15, 30, 60.
+    // Let's just delete the head and any slots that point to it?
+    // Scanning the whole day is expensive but safe.
+    // Scanning forward by some small increment (e.g. 5 mins?)
+
+    // Optimized approach:
+    // User clicked `time`. We found `headTime`.
+    // We delete `headTime`.
+    // We also need to delete any slot where `slot.headTime === headTime`.
+    // Since we object is keyed by time, we can filter.
+
+    Object.keys(day).forEach(t => {
+      if (day[t].headTime === headTime || t === headTime) {
+        delete day[t];
+      }
+    });
 
     return { ...s, [date]: day };
   });

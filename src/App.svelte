@@ -7,6 +7,8 @@
   import SlotDetailModal from "./components/modals/SlotDetailModal.svelte";
   import PwaInstallModal from "./components/modals/PwaInstallModal.svelte";
   import OnboardingModal from "./components/modals/OnboardingModal.svelte";
+  import TimeSettingsModal from "./components/modals/TimeSettingsModal.svelte";
+  import PatientStatsModal from "./components/modals/PatientStatsModal.svelte";
   import {
     toasts,
     copyYesterday,
@@ -23,6 +25,8 @@
   let showListModal = false;
   let showPwaModal = false;
   let showOnboardingModal = false;
+  let showTimeSettingsModal = false;
+  let showStatsModal = false;
   let selectedSlotData = null;
   let editingPatientData = null;
   let listModalImportMode = false;
@@ -112,6 +116,16 @@
     showOnboardingModal = true;
   };
 
+  const handleOpenTimeSettings = () => {
+    closeSidebar();
+    showTimeSettingsModal = true;
+  };
+
+  const handleOpenStats = () => {
+    closeSidebar();
+    showStatsModal = true;
+  };
+
   // Icons for Sidebar
   const CopyIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`;
   const TrashIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>`;
@@ -120,6 +134,8 @@
   const UserMinusIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="23" y1="11" x2="17" y2="11"/></svg>`;
   const PhoneIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>`;
   const BookIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`;
+  const SettingsIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>`;
+  const ChartIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>`;
 </script>
 
 <div class="drawer">
@@ -176,6 +192,16 @@
       onClose={() => (showOnboardingModal = false)}
     />
 
+    <TimeSettingsModal
+      isOpen={showTimeSettingsModal}
+      onClose={() => (showTimeSettingsModal = false)}
+    />
+
+    <PatientStatsModal
+      isOpen={showStatsModal}
+      onClose={() => (showStatsModal = false)}
+    />
+
     <!-- Toast Container -->
     {#if $toasts.length > 0}
       <div
@@ -212,6 +238,24 @@
         <button on:click={handleClear} class="gap-4 text-error">
           {@html TrashIcon}
           清空今日安排
+        </button>
+      </li>
+
+      <div class="divider"></div>
+      <li class="menu-title">设置</li>
+      <li>
+        <button on:click={handleOpenTimeSettings} class="gap-4">
+          {@html SettingsIcon}
+          时间设置
+        </button>
+      </li>
+
+      <div class="divider"></div>
+      <li class="menu-title">统计分析</li>
+      <li>
+        <button on:click={handleOpenStats} class="gap-4">
+          {@html ChartIcon}
+          患者统计
         </button>
       </li>
 
