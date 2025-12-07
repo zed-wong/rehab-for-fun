@@ -24,9 +24,9 @@
   } from "./lib/store";
   import { fly } from "svelte/transition";
   import { useRegisterSW } from "virtual:pwa-register/svelte";
-  import { injectAnalytics } from "@vercel/analytics/sveltekit";
+  import { inject } from "@vercel/analytics";
 
-  injectAnalytics({ mode: "production" });
+  inject({ mode: "production" });
 
   // PWA Logic
   let swRegistration;
