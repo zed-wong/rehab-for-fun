@@ -50,6 +50,12 @@ export const addPatient = (p) => {
 
 export const updatePatient = (id, updates) => {
   patients.update(list => list.map(p => p.id === id ? { ...p, ...updates } : p));
+
+  // If the updated patient is currently selected, update the selectedDuration logic too
+  if (get(selectedPatientId) === id && updates.duration) {
+    selectedDuration.set(updates.duration);
+  }
+
   showToast('患者已更新', 'success');
 };
 
