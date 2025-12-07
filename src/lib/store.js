@@ -20,8 +20,8 @@ const persist = (key, store, defaultVal) => {
 
 // --- Stores ---
 export const patients = writable([
-  { id: 'p1', name: '张伟', type: '脑卒中', duration: 30, color: 'bg-blue-500', contact: '13812345678', frequency: '2025.12.01开始', price: 100, category: 'Inpatient' },
-  { id: 'p2', name: '李娜', type: '骨折术后', duration: 60, color: 'bg-emerald-500', contact: '13987654321', frequency: '每周三次', price: 150, category: 'Outpatient' }
+  { id: 'p1', name: '张伟', type: '脑卒中', duration: 30, color: 'bg-blue-500', contact: '13812345678', frequency: '2025.12.01开了10次', price: 300, category: 'Inpatient' },
+  { id: 'p2', name: '李娜', type: '骨折术后', duration: 60, color: 'bg-emerald-500', contact: '13987654321', frequency: '2025.12.11开了5次', price: 400, category: 'Outpatient' }
 ]);
 
 export const schedule = writable({});
