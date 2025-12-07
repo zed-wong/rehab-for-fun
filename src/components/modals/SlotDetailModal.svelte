@@ -1,5 +1,6 @@
 <script>
   import { clearSlot, currentDate } from "../../lib/store";
+  import { fade, fly } from "svelte/transition";
 
   export let isOpen = false;
   export let slotData = null; // { time, slot, patient }
@@ -17,12 +18,18 @@
 
 {#if isOpen && slotData}
   <div
-    class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/30 backdrop-blur-sm"
+    class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+    in:fade={{ duration: 200 }}
+    out:fade={{ duration: 150 }}
     on:click|self={onClose}
+    role="dialog"
+    aria-modal="true"
   >
-    <!-- Content (Action Sheet style on mobile) -->
+    <!-- Content -->
     <div
-      class="w-full sm:max-w-sm bg-base-100 rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom duration-200"
+      class="bg-base-100 w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+      in:fly={{ y: 20, duration: 300 }}
+      out:fly={{ y: 20, duration: 200 }}
       on:click|stopPropagation
     >
       <!-- Header Color Strip -->
