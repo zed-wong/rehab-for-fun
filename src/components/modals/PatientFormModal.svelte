@@ -1,5 +1,6 @@
 <script>
   import { addPatient, updatePatient, deletePatient } from "../../lib/store";
+  import { _ } from "svelte-i18n";
 
   export let isOpen = false;
   export let patientToEdit = null; // If passed, we are editing
@@ -28,13 +29,13 @@
     reset();
   }
 
-  const colors = [
-    { label: "蓝色", val: "bg-blue-500" },
-    { label: "绿色", val: "bg-emerald-500" },
-    { label: "橙色", val: "bg-amber-500" },
-    { label: "红色", val: "bg-rose-500" },
-    { label: "紫色", val: "bg-violet-500" },
-    { label: "灰色", val: "bg-slate-500" },
+  $: colors = [
+    { label: $_("colors.blue"), val: "bg-blue-500" },
+    { label: $_("colors.green"), val: "bg-emerald-500" },
+    { label: $_("colors.orange"), val: "bg-amber-500" },
+    { label: $_("colors.red"), val: "bg-rose-500" },
+    { label: $_("colors.purple"), val: "bg-violet-500" },
+    { label: $_("colors.gray"), val: "bg-slate-500" },
   ];
 
   const handleSubmit = () => {
@@ -68,7 +69,7 @@
   };
 
   const handleDelete = () => {
-    if (confirm("确定要永久删除此患者吗？")) {
+    if (confirm($_("modal.patient_form.delete_confirm"))) {
       deletePatient(patientToEdit.id);
       onClose();
     }
@@ -101,34 +102,42 @@
       <div class="card-body">
         <div class="flex justify-between items-center">
           <h2 class="card-title text-lg font-bold">
-            {patientToEdit ? "编辑患者" : "添加患者"}
+            {patientToEdit
+              ? $_("modal.patient_form.edit_title")
+              : $_("modal.patient_form.add_title")}
           </h2>
           {#if patientToEdit}
             <button
               class="btn btn-xs btn-outline btn-error"
-              on:click={handleDelete}>删除</button
+              on:click={handleDelete}>{$_("modal.common.delete")}</button
             >
           {/if}
         </div>
 
         <!-- Name -->
         <div class="form-control w-full">
-          <label class="label"><span class="label-text">姓名</span></label>
+          <label class="label"
+            ><span class="label-text">{$_("modal.patient_form.name")}</span
+            ></label
+          >
           <input
             type="text"
             bind:value={name}
-            placeholder="例如：张伟"
+            placeholder={$_("modal.patient_form.name_placeholder")}
             class="input input-bordered w-full"
           />
         </div>
 
         <!-- Contact (New) -->
         <div class="form-control w-full">
-          <label class="label"><span class="label-text">联系方式</span></label>
+          <label class="label"
+            ><span class="label-text">{$_("modal.patient_form.contact")}</span
+            ></label
+          >
           <input
             type="text"
             bind:value={contact}
-            placeholder="电话号码或其他"
+            placeholder={$_("modal.patient_form.contact_placeholder")}
             class="input input-bordered w-full"
           />
         </div>
@@ -136,7 +145,8 @@
         <!-- Price (New) -->
         <div class="form-control w-full">
           <label class="label"
-            ><span class="label-text">单次费用 (元)</span></label
+            ><span class="label-text">{$_("modal.patient_form.price")}</span
+            ></label
           >
           <input
             type="number"
@@ -148,11 +158,14 @@
 
         <!-- Frequency (New) -->
         <div class="form-control w-full">
-          <label class="label"><span class="label-text">日期/次数</span></label>
+          <label class="label"
+            ><span class="label-text">{$_("modal.patient_form.frequency")}</span
+            ></label
+          >
           <input
             type="text"
             bind:value={frequency}
-            placeholder="例如：2025.12.07开了10次"
+            placeholder={$_("modal.patient_form.frequency_placeholder")}
             class="input input-bordered w-full"
           />
         </div>
@@ -160,19 +173,23 @@
         <!-- Diagnosis -->
         <div class="form-control w-full">
           <label class="label"
-            ><span class="label-text">诊断 / 备注</span></label
+            ><span class="label-text">{$_("modal.patient_form.diagnosis")}</span
+            ></label
           >
           <input
             type="text"
             bind:value={type}
-            placeholder="例如：脑卒中"
+            placeholder={$_("modal.patient_form.diagnosis_placeholder")}
             class="input input-bordered w-full"
           />
         </div>
 
         <!-- Category -->
         <div class="form-control">
-          <label class="label"><span class="label-text">类别</span></label>
+          <label class="label"
+            ><span class="label-text">{$_("modal.patient_form.category")}</span
+            ></label
+          >
           <div class="flex gap-4">
             <label class="label cursor-pointer gap-2">
               <input
@@ -181,7 +198,9 @@
                 value="Inpatient"
                 class="radio radio-sm"
               />
-              <span class="label-text">住院</span>
+              <span class="label-text"
+                >{$_("modal.patient_form.inpatient")}</span
+              >
             </label>
             <label class="label cursor-pointer gap-2">
               <input
@@ -190,14 +209,20 @@
                 value="Outpatient"
                 class="radio radio-sm"
               />
-              <span class="label-text">门诊</span>
+              <span class="label-text"
+                >{$_("modal.patient_form.outpatient")}</span
+              >
             </label>
           </div>
         </div>
 
         <!-- Duration -->
         <div class="form-control">
-          <label class="label"><span class="label-text">默认时长</span></label>
+          <label class="label"
+            ><span class="label-text"
+              >{$_("modal.patient_form.default_duration")}</span
+            ></label
+          >
           <div class="flex gap-4">
             <label
               class="label cursor-pointer gap-2 border rounded-lg px-3 py-2 flex-1 {duration ===
@@ -211,7 +236,9 @@
                 value={30}
                 class="radio radio-primary radio-sm"
               />
-              <span class="label-text font-medium">30 分钟</span>
+              <span class="label-text font-medium"
+                >{$_("common.full_mins", { values: { m: 30 } })}</span
+              >
             </label>
             <label
               class="label cursor-pointer gap-2 border rounded-lg px-3 py-2 flex-1 {duration ===
@@ -225,14 +252,19 @@
                 value={60}
                 class="radio radio-primary radio-sm"
               />
-              <span class="label-text font-medium">1 小时</span>
+              <span class="label-text font-medium"
+                >{$_("common.full_hours", { values: { h: 1 } })}</span
+              >
             </label>
           </div>
         </div>
 
         <!-- Color -->
         <div class="form-control">
-          <label class="label"><span class="label-text">标签颜色</span></label>
+          <label class="label"
+            ><span class="label-text">{$_("modal.patient_form.color")}</span
+            ></label
+          >
           <div class="flex gap-2 flex-wrap">
             {#each colors as c}
               <button
@@ -249,8 +281,12 @@
         </div>
 
         <div class="card-actions justify-end mt-4">
-          <button class="btn btn-ghost" on:click={onClose}>取消</button>
-          <button class="btn btn-primary" on:click={handleSubmit}>保存</button>
+          <button class="btn btn-ghost" on:click={onClose}
+            >{$_("modal.common.cancel")}</button
+          >
+          <button class="btn btn-primary" on:click={handleSubmit}
+            >{$_("modal.common.save")}</button
+          >
         </div>
       </div>
     </div>

@@ -11,6 +11,7 @@
   import PatientStatsModal from "./components/modals/PatientStatsModal.svelte";
   import WorkloadStatsModal from "./components/modals/WorkloadStatsModal.svelte";
   import ExportModal from "./components/modals/ExportModal.svelte";
+  import { get } from "svelte/store";
   import {
     toasts,
     copyYesterday,
@@ -23,7 +24,9 @@
     paintSlot,
   } from "./lib/store";
   import { fly } from "svelte/transition";
+
   import { useRegisterSW } from "virtual:pwa-register/svelte";
+  import { _, locale, isLoading } from "svelte-i18n";
 
   // PWA Logic
   let swRegistration;
@@ -48,14 +51,14 @@
         // Give it a moment to check, then notify if state didn't change to needRefresh
         setTimeout(() => {
           if (!$needRefresh) {
-            showToast("当前已是最新版本", "success");
+            showToast(get(_)("sidebar.update_latest"), "success");
           }
         }, 1000);
       } catch (e) {
-        showToast("检查更新失败", "error");
+        showToast(get(_)("sidebar.check_error"), "error");
       }
     } else {
-      showToast("未激活离线模式 (开发环境)", "info");
+      showToast(get(_)("sidebar.offline_dev"), "info");
     }
   };
 
@@ -108,11 +111,11 @@
     closeSidebar();
     setTimeout(() => {
       if (!checkYesterdayData()) {
-        showToast("昨日无数据可复制", "warning");
+        showToast(get(_)("header.no_data_yesterday"), "warning");
         return;
       }
 
-      if (confirm("确定要复制昨日的安排到今天吗？这将覆盖今天的布局。")) {
+      if (confirm(get(_)("header.confirm_copy"))) {
         copyYesterday();
       }
     }, 100);
@@ -121,7 +124,7 @@
   const handleClear = () => {
     closeSidebar();
     setTimeout(() => {
-      if (confirm("确定要清空今天的全部安排吗？此操作无法撤销。")) {
+      if (confirm(get(_)("sidebar.confirm_clear_today"))) {
         clearDay();
       }
     }, 100);
@@ -141,11 +144,7 @@
   const handleClearAllPatients = () => {
     closeSidebar();
     setTimeout(() => {
-      if (
-        confirm(
-          "⚠️ 确定要清空所有患者数据吗？\n\n这将删除所有已录入的患者信息，此操作无法撤销。",
-        )
-      ) {
+      if (confirm(get(_)("sidebar.confirm_clear_all_patients"))) {
         clearAllPatients();
       }
     }, 100);
@@ -190,200 +189,224 @@
   const UpdateIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>`;
 </script>
 
-<div class="drawer">
-  <input id="my-drawer" type="checkbox" class="drawer-toggle" />
-  <div
-    class="drawer-content flex flex-col min-h-screen bg-base-200 font-sans"
-    data-theme="winter"
-  >
-    <Header />
-
-    <PatientPalette
-      on:openAddModal={handleOpenAdd}
-      on:editPatient={handleEditPatient}
-      on:openShowAll={() => {
-        listModalImportMode = false;
-        showListModal = true;
-      }}
-    />
-
-    <main
-      class="max-w-md mx-auto bg-base-100 min-h-screen shadow-xl sm:border-x border-base-200 w-full"
-    >
-      <ScheduleGrid
-        on:openDetail={handleOpenDetail}
-        on:openPatientSelect={handleGridSlotClick}
-      />
-    </main>
-
-    <!-- Modals -->
-    <PatientFormModal
-      isOpen={showPatientModal}
-      patientToEdit={editingPatientData}
-      onClose={() => (showPatientModal = false)}
-    />
-
-    <PatientListModal
-      isOpen={showListModal}
-      importMode={listModalImportMode}
-      selectOnly={!!pendingSlotTime}
-      onClose={() => (showListModal = false)}
-      on:editPatient={handleEditPatient}
-      on:addNew={handleOpenAdd}
-      on:selectPatient={handlePatientSelected}
-      on:openExport={() => {
-        showListModal = false;
-        showExportModal = true;
-      }}
-    />
-
-    <SlotDetailModal
-      isOpen={showDetailModal}
-      slotData={selectedSlotData}
-      onClose={() => (showDetailModal = false)}
-    />
-
-    <PwaInstallModal
-      isOpen={showPwaModal}
-      onClose={() => (showPwaModal = false)}
-    />
-
-    <OnboardingModal
-      isOpen={showOnboardingModal}
-      onClose={() => (showOnboardingModal = false)}
-    />
-
-    <TimeSettingsModal
-      isOpen={showTimeSettingsModal}
-      onClose={() => (showTimeSettingsModal = false)}
-    />
-
-    <PatientStatsModal
-      isOpen={showStatsModal}
-      onClose={() => (showStatsModal = false)}
-    />
-
-    <WorkloadStatsModal
-      isOpen={showWorkloadModal}
-      onClose={() => (showWorkloadModal = false)}
-    />
-
-    <ExportModal
-      isOpen={showExportModal}
-      onClose={() => (showExportModal = false)}
-    />
-
-    <!-- Toast Container -->
-    {#if $toasts.length > 0}
-      <div
-        class="toast toast-bottom toast-center z-[100] w-full max-w-sm px-4 pointer-events-none"
-      >
-        {#each $toasts as t (t.id)}
-          <div
-            in:fly={{ y: 20, duration: 200 }}
-            out:fly={{ y: 20, duration: 200 }}
-            class="alert shadow-lg border-none {t.type === 'error'
-              ? 'alert-error text-white'
-              : t.type === 'success'
-                ? 'alert-success text-white'
-                : 'alert-info'}"
-          >
-            <span>{t.message}</span>
-          </div>
-        {/each}
-      </div>
-    {/if}
+{#if $isLoading}
+  <div class="flex items-center justify-center min-h-screen bg-base-200">
+    <span class="loading loading-spinner loading-lg text-primary"></span>
   </div>
-  <div class="drawer-side z-[100]">
-    <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"
-    ></label>
-    <ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
-      <li class="menu-title">菜单</li>
-      <li>
-        <button on:click={handleCopy} class="gap-4">
-          {@html CopyIcon}
-          复制昨日安排
-        </button>
-      </li>
-      <li>
-        <button on:click={handleClear} class="gap-4 text-error">
-          {@html TrashIcon}
-          清空今日安排
-        </button>
-      </li>
+{:else}
+  <div class="drawer">
+    <input id="my-drawer" type="checkbox" class="drawer-toggle" />
+    <div
+      class="drawer-content flex flex-col min-h-screen bg-base-200 font-sans"
+      data-theme="winter"
+    >
+      <Header />
 
-      <div class="divider"></div>
-      <li class="menu-title">统计分析</li>
-      <li>
-        <button on:click={handleOpenStats} class="gap-4">
-          {@html ChartIcon}
-          患者统计
-        </button>
-      </li>
-      <li>
-        <button on:click={handleOpenWorkload} class="gap-4">
-          {@html TrendingUpIcon}
-          工作量统计
-        </button>
-      </li>
+      <PatientPalette
+        on:openAddModal={handleOpenAdd}
+        on:editPatient={handleEditPatient}
+        on:openShowAll={() => {
+          listModalImportMode = false;
+          showListModal = true;
+        }}
+      />
 
-      <div class="divider"></div>
-      <li class="menu-title">数据管理</li>
-      <li>
-        <button on:click={handleExportPatients} class="gap-4">
-          {@html ExportIcon}
-          导出备份数据
-        </button>
-      </li>
-      <li>
-        <button on:click={handleImportPatients} class="gap-4">
-          {@html ImportIcon}
-          导入恢复数据
-        </button>
-      </li>
-      <li>
-        <button on:click={handleClearAllPatients} class="gap-4 text-error">
-          {@html UserMinusIcon}
-          清空所有患者
-        </button>
-      </li>
+      <main
+        class="max-w-md mx-auto bg-base-100 min-h-screen shadow-xl sm:border-x border-base-200 w-full"
+      >
+        <ScheduleGrid
+          on:openDetail={handleOpenDetail}
+          on:openPatientSelect={handleGridSlotClick}
+        />
+      </main>
 
-      <div class="divider"></div>
-      <li class="menu-title">设置</li>
-      <li>
-        <button on:click={handleOpenTimeSettings} class="gap-4">
-          {@html SettingsIcon}
-          时间设置
-        </button>
-      </li>
+      <!-- Modals -->
+      <PatientFormModal
+        isOpen={showPatientModal}
+        patientToEdit={editingPatientData}
+        onClose={() => (showPatientModal = false)}
+      />
 
-      <div class="divider"></div>
-      <li class="menu-title">应用</li>
-      {#if swRegistration || $needRefresh}
+      <PatientListModal
+        isOpen={showListModal}
+        importMode={listModalImportMode}
+        selectOnly={!!pendingSlotTime}
+        onClose={() => (showListModal = false)}
+        on:editPatient={handleEditPatient}
+        on:addNew={handleOpenAdd}
+        on:selectPatient={handlePatientSelected}
+        on:openExport={() => {
+          showListModal = false;
+          showExportModal = true;
+        }}
+      />
+
+      <SlotDetailModal
+        isOpen={showDetailModal}
+        slotData={selectedSlotData}
+        onClose={() => (showDetailModal = false)}
+      />
+
+      <PwaInstallModal
+        isOpen={showPwaModal}
+        onClose={() => (showPwaModal = false)}
+      />
+
+      <OnboardingModal
+        isOpen={showOnboardingModal}
+        onClose={() => (showOnboardingModal = false)}
+      />
+
+      <TimeSettingsModal
+        isOpen={showTimeSettingsModal}
+        onClose={() => (showTimeSettingsModal = false)}
+      />
+
+      <PatientStatsModal
+        isOpen={showStatsModal}
+        onClose={() => (showStatsModal = false)}
+      />
+
+      <WorkloadStatsModal
+        isOpen={showWorkloadModal}
+        onClose={() => (showWorkloadModal = false)}
+      />
+
+      <ExportModal
+        isOpen={showExportModal}
+        onClose={() => (showExportModal = false)}
+      />
+
+      <!-- Toast Container -->
+      {#if $toasts.length > 0}
+        <div
+          class="toast toast-bottom toast-center z-[100] w-full max-w-sm px-4 pointer-events-none"
+        >
+          {#each $toasts as t (t.id)}
+            <div
+              in:fly={{ y: 20, duration: 200 }}
+              out:fly={{ y: 20, duration: 200 }}
+              class="alert shadow-lg border-none {t.type === 'error'
+                ? 'alert-error text-white'
+                : t.type === 'success'
+                  ? 'alert-success text-white'
+                  : 'alert-info'}"
+            >
+              <span>{t.message}</span>
+            </div>
+          {/each}
+        </div>
+      {/if}
+    </div>
+    <div class="drawer-side z-[100]">
+      <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"
+      ></label>
+      <ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
+        <li class="menu-title">{$_("sidebar.menu")}</li>
         <li>
-          <button on:click={handleUpdateApp} class="gap-4">
-            {@html UpdateIcon}
-            {#if $needRefresh}
-              <span class="text-primary font-bold">更新可用 (点击刷新)</span>
-              <span class="badge badge-xs badge-primary animate-pulse"></span>
-            {:else}
-              检查更新
-            {/if}
+          <button on:click={handleCopy} class="gap-4">
+            {@html CopyIcon}
+            {$_("sidebar.copy_yesterday")}
           </button>
         </li>
-      {/if}
-      <li>
-        <button on:click={handleOpenOnboarding} class="gap-4">
-          {@html BookIcon}
-          使用指南
-        </button>
-      </li>
-      <li>
-        <button on:click={handleOpenPwaHelp} class="gap-4">
-          {@html PhoneIcon}
-          安装到主屏幕
-        </button>
-      </li>
-    </ul>
+        <li>
+          <button on:click={handleClear} class="gap-4 text-error">
+            {@html TrashIcon}
+            {$_("sidebar.clear_today")}
+          </button>
+        </li>
+
+        <div class="divider"></div>
+        <li class="menu-title">{$_("sidebar.stats")}</li>
+        <li>
+          <button on:click={handleOpenStats} class="gap-4">
+            {@html ChartIcon}
+            {$_("sidebar.patient_stats")}
+          </button>
+        </li>
+        <li>
+          <button on:click={handleOpenWorkload} class="gap-4">
+            {@html TrendingUpIcon}
+            {$_("sidebar.workload_stats")}
+          </button>
+        </li>
+
+        <div class="divider"></div>
+        <li class="menu-title">{$_("sidebar.data_mgmt")}</li>
+        <li>
+          <button on:click={handleExportPatients} class="gap-4">
+            {@html ExportIcon}
+            {$_("sidebar.export_data")}
+          </button>
+        </li>
+        <li>
+          <button on:click={handleImportPatients} class="gap-4">
+            {@html ImportIcon}
+            {$_("sidebar.import_data")}
+          </button>
+        </li>
+        <li>
+          <button on:click={handleClearAllPatients} class="gap-4 text-error">
+            {@html UserMinusIcon}
+            {$_("sidebar.clear_all_patients")}
+          </button>
+        </li>
+
+        <div class="divider"></div>
+        <li class="menu-title">{$_("sidebar.settings")}</li>
+        <li>
+          <button on:click={handleOpenTimeSettings} class="gap-4">
+            {@html SettingsIcon}
+            {$_("sidebar.time_settings")}
+          </button>
+        </li>
+
+        <div class="divider"></div>
+        <li class="menu-title">{$_("sidebar.language")}</li>
+        <li>
+          <select
+            class="select select-ghost w-full max-w-xs"
+            value={$locale}
+            on:change={(e) => {
+              locale.set(e.target.value);
+              localStorage.setItem("locale", e.target.value);
+            }}
+          >
+            <option value="zh">中文</option>
+            <option value="en">English</option>
+          </select>
+        </li>
+
+        <div class="divider"></div>
+        <li class="menu-title">{$_("sidebar.app")}</li>
+        {#if swRegistration || $needRefresh}
+          <li>
+            <button on:click={handleUpdateApp} class="gap-4">
+              {@html UpdateIcon}
+              {#if $needRefresh}
+                <span class="text-primary font-bold"
+                  >{$_("sidebar.update_available_action")}</span
+                >
+                <span class="badge badge-xs badge-primary animate-pulse"></span>
+              {:else}
+                {$_("sidebar.check_update")}
+              {/if}
+            </button>
+          </li>
+        {/if}
+        <li>
+          <button on:click={handleOpenOnboarding} class="gap-4">
+            {@html BookIcon}
+            {$_("sidebar.user_guide")}
+          </button>
+        </li>
+        <li>
+          <button on:click={handleOpenPwaHelp} class="gap-4">
+            {@html PhoneIcon}
+            {$_("sidebar.install_app")}
+          </button>
+        </li>
+      </ul>
+    </div>
   </div>
-</div>
+{/if}

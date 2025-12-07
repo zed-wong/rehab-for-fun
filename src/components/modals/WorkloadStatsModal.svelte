@@ -1,6 +1,7 @@
 <script>
   import { schedule, patients, currentDate } from "../../lib/store";
   import { fade, fly } from "svelte/transition";
+  import { _ } from "svelte-i18n";
 
   export let isOpen = false;
   export let onClose = () => {};
@@ -96,58 +97,75 @@
       <div
         class="px-5 py-4 border-b border-base-200 flex items-center justify-between bg-base-100 z-10"
       >
-        <h2 class="text-lg font-bold">工作量统计</h2>
+        <h2 class="text-lg font-bold">{$_("modal.workload_stats.title")}</h2>
         <button class="btn btn-sm btn-circle btn-ghost" on:click={onClose}
           >✕</button
         >
       </div>
 
       <div class="p-4 bg-base-50 border-b border-base-200">
-        <div class="grid grid-cols-2 gap-4">
-          <div class="form-control">
-            <label class="label" for="startDate"
-              ><span class="label-text">开始日期</span></label
-            >
+        <!-- Date Range Filter -->
+        <div
+          class="flex gap-4 items-end bg-base-100 p-4 rounded-xl shadow-sm border border-base-200"
+        >
+          <div class="form-control w-full">
+            <label class="label">
+              <span class="label-text"
+                >{$_("modal.workload_stats.start_date")}</span
+              >
+            </label>
             <input
-              id="startDate"
               type="date"
               bind:value={startDate}
-              class="input input-sm input-bordered w-full"
+              class="input input-bordered w-full"
             />
           </div>
-          <div class="form-control">
-            <label class="label" for="endDate"
-              ><span class="label-text">结束日期</span></label
-            >
+          <div class="form-control w-full">
+            <label class="label">
+              <span class="label-text"
+                >{$_("modal.workload_stats.end_date")}</span
+              >
+            </label>
             <input
-              id="endDate"
               type="date"
               bind:value={endDate}
-              class="input input-sm input-bordered w-full"
+              class="input input-bordered w-full"
             />
           </div>
         </div>
       </div>
 
       <div class="flex-1 overflow-y-auto p-4">
+        <div class="px-6 py-4 bg-primary text-primary-content text-center">
+          <h2 class="text-2xl font-bold mb-1">
+            {$_("modal.workload_stats.title")}
+          </h2>
+          <p class="text-primary-content/80 text-sm">
+            {$_("modal.workload_stats.subtitle")}
+          </p>
+        </div>
         <div class="stats shadow w-full mb-6 bg-primary text-primary-content">
           <div class="stat">
-            <div class="stat-title text-primary-content/80">总收入</div>
+            <div class="stat-title text-primary-content/80">
+              {$_("modal.workload_stats.total_income")}
+            </div>
             <div class="stat-value">¥{totalIncome}</div>
             <div class="stat-desc text-primary-content/70">
-              共 {totalVisits} 人次
+              {$_("modal.workload_stats.total_visits", {
+                values: { count: totalVisits },
+              })}
             </div>
           </div>
         </div>
 
         <h3 class="font-bold text-sm text-base-content/70 mb-3 px-1">
-          收入明细
+          {$_("modal.workload_stats.income_breakdown")}
         </h3>
         {#if breakdown.length === 0}
           <div
             class="text-center py-8 text-base-content/40 border border-dashed rounded-xl"
           >
-            该时间段暂无记录
+            {$_("modal.workload_stats.no_records_period")}
           </div>
         {:else}
           <div class="space-y-2">
@@ -158,7 +176,9 @@
                 <div class="flex flex-col">
                   <span class="font-medium text-base-content">{item.name}</span>
                   <span class="text-xs text-base-content/50"
-                    >{item.count} 次</span
+                    >{$_("modal.workload_stats.count_unit", {
+                      values: { count: item.count },
+                    })}</span
                   >
                 </div>
                 <div class="font-bold text-lg">

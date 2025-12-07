@@ -2,6 +2,7 @@
   import { patients, selectedPatientId, selectedDuration } from "../lib/store";
   import { createEventDispatcher } from "svelte";
   import { fade } from "svelte/transition";
+  import { _ } from "svelte-i18n";
 
   const dispatch = createEventDispatcher();
 
@@ -43,8 +44,8 @@
     <button
       class="btn btn-sm btn-circle btn-ghost border border-base-200 text-base-content/70 hover:bg-base-200 shrink-0 snap-start"
       on:click={() => dispatch("openAddModal")}
-      aria-label="添加患者"
-      title="添加患者"
+      aria-label={$_("patient_palette.add_patient")}
+      title={$_("patient_palette.add_patient")}
     >
       {@html PlusIcon}
     </button>
@@ -53,8 +54,8 @@
     <button
       class="btn btn-sm btn-circle btn-ghost border border-base-200 text-base-content/70 hover:bg-base-200 shrink-0 snap-start"
       on:click={() => dispatch("openShowAll")}
-      aria-label="查看所有"
-      title="搜索 / 查看所有"
+      aria-label={$_("patient_palette.view_all")}
+      title={$_("patient_palette.search_view_all")}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -109,15 +110,20 @@
             class="badge badge-sm border-0 text-[10px] h-5 px-1 min-w-[2rem] justify-center cursor-pointer bg-white/20 hover:bg-white/30 transition-colors"
             on:click={toggleDuration}
             on:keydown={(e) => e.key === "Enter" && toggleDuration(e)}
-            title="切换时长"
+            title={$_("patient_palette.toggle_duration")}
           >
-            {$selectedDuration === 60 ? "1小时" : "30分"}
+            {$selectedDuration === 60
+              ? $_("common.hours", { values: { h: 1 } })
+              : $_("common.mins", { values: { m: 30 } })}
           </div>
         {:else}
           <span
             class="badge badge-sm badge-ghost bg-opacity-20 border-0 text-[10px] h-5 px-1 min-w-[2rem] justify-center"
           >
-            {p.duration === 60 ? "1小时" : "30分"}
+            >
+            {p.duration === 60
+              ? $_("common.hours", { values: { h: 1 } })
+              : $_("common.mins", { values: { m: 30 } })}
           </span>
         {/if}
 
@@ -128,7 +134,9 @@
           class="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full hover:bg-black/10 transition-colors"
           on:click={(e) => editPatient(p, e)}
           on:keydown={(e) => e.key === "Enter" && editPatient(p, e)}
-          aria-label="编辑 {p.name}"
+          title={$_("patient_palette.edit_patient", {
+            values: { name: p.name },
+          })}
         >
           {@html EditIcon}
         </div>

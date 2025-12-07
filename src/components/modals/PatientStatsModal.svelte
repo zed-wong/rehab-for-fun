@@ -1,6 +1,7 @@
 <script>
   import { patients, schedule } from "../../lib/store";
   import { fade, fly } from "svelte/transition";
+  import { _ } from "svelte-i18n";
 
   export let isOpen = false;
   export let onClose = () => {};
@@ -83,7 +84,7 @@
             <button
               class="btn btn-sm btn-circle btn-ghost"
               on:click={handleBack}
-              aria-label="返回列表"
+              aria-label={$_("modal.patient_stats.back_to_list")}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -97,9 +98,20 @@
                 stroke-linejoin="round"><path d="m15 18-6-6 6-6" /></svg
               >
             </button>
-            <h2 class="text-lg font-bold">患者统计: {selectedPatient.name}</h2>
+            <div class="px-6 py-4 bg-primary text-primary-content text-center">
+              <h2 class="text-2xl font-bold mb-1">
+                {$_("modal.patient_stats.title", {
+                  values: { name: selectedPatient.name },
+                })}
+              </h2>
+              <p class="text-primary-content/80 text-sm">
+                {$_("modal.patient_stats.subtitle")}
+              </p>
+            </div>
           {:else}
-            <h2 class="text-lg font-bold">患者统计</h2>
+            <h2 class="text-lg font-bold">
+              {$_("modal.patient_stats.title_general")}
+            </h2>
           {/if}
         </div>
         <button class="btn btn-sm btn-circle btn-ghost" on:click={onClose}
@@ -113,7 +125,7 @@
           <div class="p-3 border-b border-base-200 bg-base-50/50">
             <input
               type="text"
-              placeholder="搜索姓名..."
+              placeholder={$_("modal.patient_stats.search_placeholder")}
               bind:value={searchQuery}
               class="input input-sm input-bordered w-full rounded-lg"
             />
@@ -122,7 +134,7 @@
           <div class="overflow-y-auto p-2 space-y-1">
             {#if filteredPatients.length === 0}
               <div class="text-center text-base-content/50 py-10">
-                未找到患者
+                {$_("modal.patient_stats.not_found")}
               </div>
             {/if}
             {#each filteredPatients as p (p.id)}
@@ -138,10 +150,12 @@
                 <div class="flex-1">
                   <div class="font-medium">{p.name}</div>
                   <div class="text-xs text-base-content/60">
-                    {p.type || "无诊断"}
+                    {p.type || $_("modal.patient_list.no_diagnosis")}
                   </div>
                 </div>
-                <div class="text-xs text-base-content/40">查看详情 ›</div>
+                <div class="text-xs text-base-content/40">
+                  {$_("modal.patient_stats.view_details")}
+                </div>
               </button>
             {/each}
           </div>
@@ -149,31 +163,18 @@
           <!-- Detail View -->
           <div class="flex-1 overflow-y-auto p-6">
             <!-- Summary Cards -->
-            <div class="grid grid-cols-2 gap-4 mb-8">
-              <div class="stats shadow bg-base-200/50">
-                <div class="stat place-items-center">
-                  <div class="stat-title">总计就诊</div>
-                  <div class="stat-value text-primary">{stats.count}</div>
-                  <div class="stat-desc">次</div>
-                </div>
-              </div>
-              <div class="stats shadow bg-base-200/50">
-                <div class="stat place-items-center">
-                  <div class="stat-title">最近就诊</div>
-                  <div class="stat-value text-xs mt-2">
-                    {stats.history.length > 0 ? stats.history[0].date : "暂无"}
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            <h3 class="font-bold mb-4 px-1">就诊记录 ({stats.count})</h3>
+            <h3 class="font-bold mb-4 px-1">
+              {$_("modal.patient_stats.visits_title", {
+                values: { count: stats.count },
+              })}
+            </h3>
 
             {#if stats.history.length === 0}
               <div
                 class="text-center text-base-content/50 py-10 rounded-xl bg-base-100 border border-dashed border-base-300"
               >
-                暂无就诊记录
+                {$_("modal.patient_stats.no_records")}
               </div>
             {:else}
               <div
@@ -226,7 +227,9 @@
                         >
                       </div>
                       <div class="text-xs text-base-content/70">
-                        时长: {item.duration} 分钟
+                        {$_("modal.patient_stats.duration", {
+                          values: { duration: item.duration },
+                        })}
                       </div>
                     </div>
                   </div>

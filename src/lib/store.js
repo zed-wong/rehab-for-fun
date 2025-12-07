@@ -1,4 +1,5 @@
 import { writable, get } from 'svelte/store';
+import { _ } from 'svelte-i18n';
 
 // --- Data Structures ---
 // Patient: { id, name, type, duration (30|60), color }
@@ -45,7 +46,8 @@ export const showToast = (message, type = 'info') => {
 // --- Patient Actions ---
 export const addPatient = (p) => {
   patients.update(list => [...list, { ...p, id: crypto.randomUUID() }]);
-  showToast('患者已添加', 'success');
+  const $t = get(_); // Access the translation function
+  showToast($t("store.patient_added"), "success");
 };
 
 export const updatePatient = (id, updates) => {
@@ -56,19 +58,22 @@ export const updatePatient = (id, updates) => {
     selectedDuration.set(updates.duration);
   }
 
-  showToast('患者已更新', 'success');
+  const $t = get(_);
+  showToast($t("store.patient_updated"), "success");
 };
 
 export const deletePatient = (id) => {
   patients.update(list => list.filter(p => p.id !== id));
   selectedPatientId.update(curr => curr === id ? null : curr);
-  showToast('患者已删除', 'warning');
+  const $t = get(_);
+  showToast($t('store.patient_deleted'), 'warning');
 };
 
 export const clearAllPatients = () => {
   patients.set([]);
   selectedPatientId.set(null);
-  showToast('所有患者已清空', 'warning');
+  const $t = get(_);
+  showToast($t('store.all_cleared'), 'warning');
 };
 
 // --- Schedule Actions ---
@@ -79,12 +84,8 @@ const addMinutes = (time, mins) => {
   const date = new Date(0, 0, 0, h, m + mins);
   const hh = date.getHours().toString().padStart(2, '0');
   const mm = date.getMinutes().toString().padStart(2, '0');
-  return `${hh}:${mm}`;
+  return `${hh}:${mm} `;
 };
-
-// ... (existing imports)
-
-// ... (existing imports)
 
 export const selectedDuration = writable(30);
 
@@ -98,13 +99,14 @@ persist('rehab_settings_v1', scheduleSettings, { startHour: 7, endHour: 20, time
 export const paintSlot = (time, specificDetails = null) => {
   let patient;
   let duration;
+  const $t = get(_);
 
   if (specificDetails?.patient) {
     patient = specificDetails.patient;
     duration = specificDetails.duration || (Number(patient.duration) || 30);
   } else {
     const sPatientId = get(selectedPatientId);
-    if (!sPatientId) return showToast('请先选择一个患者', 'error');
+    if (!sPatientId) return showToast($t('store.select_patient_first'), 'error');
 
     const allPatients = get(patients);
     patient = allPatients.find(p => p.id === sPatientId);
@@ -125,7 +127,7 @@ export const paintSlot = (time, specificDetails = null) => {
   // 1. Validation Phase
   for (let i = 0; i < slotsNeeded; i++) {
     if (daySchedule[checkTime]) {
-      return showToast(`时间段 ${checkTime} 已被占用`, 'error');
+      return showToast($t('store.slot_occupied', { values: { time: checkTime } }), 'error');
     }
     // Optional: check bounds (e.g. beyond 20:00 or endHour)
     // We'll skip bound check for now or rely on grid not showing them, 
@@ -159,11 +161,12 @@ export const paintSlot = (time, specificDetails = null) => {
     return { ...s, [date]: newDay };
   });
 
-  showToast('预约成功', 'success');
+  showToast($t('store.appointment_success'), 'success');
 };
 
 export const clearSlot = (date, time) => {
   const { timeStep } = get(scheduleSettings);
+  const $t = get(_);
 
   schedule.update(s => {
     const day = { ...(s[date] || {}) };
@@ -215,7 +218,7 @@ export const clearSlot = (date, time) => {
 
     return { ...s, [date]: day };
   });
-  showToast('已清除', 'info');
+  showToast($t('store.cleared'), 'info');
 };
 
 export const checkYesterdayData = () => {
@@ -234,24 +237,26 @@ export const copyYesterday = () => {
   const yesterday = d.toLocaleDateString('en-CA');
 
   const allSch = get(schedule);
+  const $t = get(_);
 
   if (allSch[yesterday]) {
     schedule.update(s => ({
       ...s,
       [date]: JSON.parse(JSON.stringify(allSch[yesterday])) // Deep copy
     }));
-    showToast('已复制昨日安排', 'success');
+    showToast($t('store.copy_success'), 'success');
   } else {
-    showToast('昨日无数据', 'warning');
+    showToast($t('store.no_data_yesterday'), 'warning');
   }
 };
 
 export const clearDay = () => {
   const date = get(currentDate);
+  const $t = get(_);
   schedule.update(s => {
     const newSch = { ...s };
     delete newSch[date];
     return newSch;
   });
-  showToast('本日安排已清空', 'success');
+  showToast($t('store.today_cleared'), 'success');
 };

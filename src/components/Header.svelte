@@ -1,4 +1,5 @@
 <script>
+  import { _ } from "svelte-i18n";
   import {
     currentDate,
     checkYesterdayData,
@@ -25,11 +26,11 @@
 
   const handleCopy = () => {
     if (!checkYesterdayData()) {
-      showToast("昨日无数据可复制", "warning");
+      showToast($_("header.no_data_yesterday"), "warning");
       return;
     }
 
-    if (confirm("确定要复制昨日的安排到今天吗？这将覆盖今天的布局。")) {
+    if (confirm($_("header.confirm_copy"))) {
       copyYesterday();
     }
   };
@@ -43,7 +44,7 @@
     <label
       for="my-drawer"
       class="btn btn-sm btn-circle btn-ghost drawer-button"
-      aria-label="打开菜单"
+      aria-label={$_("header.open_menu")}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -70,8 +71,8 @@
     <button
       class="btn btn-sm btn-circle btn-ghost"
       on:click={() => changeDay(-1)}
-      aria-label="前一天"
-      title="前一天"
+      aria-label={$_("header.prev_day")}
+      title={$_("header.prev_day")}
     >
       {@html ChevLeft}
     </button>
@@ -106,8 +107,8 @@
     <button
       class="btn btn-sm btn-circle btn-ghost"
       on:click={() => changeDay(1)}
-      aria-label="后一天"
-      title="后一天"
+      aria-label={$_("header.next_day")}
+      title={$_("header.next_day")}
     >
       {@html ChevRight}
     </button>
@@ -118,12 +119,14 @@
     <button
       class="btn btn-sm btn-ghost gap-2"
       on:click={handleCopy}
-      title="复制昨日安排"
+      title={$_("header.copy_yesterday")}
     >
       <div class="opacity-70">
         {@html CopyIcon}
       </div>
-      <span class="hidden sm:inline text-xs opacity-70">复制昨日</span>
+      <span class="hidden sm:inline text-xs opacity-70"
+        >{$_("header.copy_yesterday_short")}</span
+      >
     </button>
   </div>
 </header>

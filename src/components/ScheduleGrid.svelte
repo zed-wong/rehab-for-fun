@@ -8,6 +8,7 @@
     scheduleSettings,
   } from "../lib/store";
   import { createEventDispatcher } from "svelte";
+  import { _ } from "svelte-i18n";
 
   const dispatch = createEventDispatcher();
 
@@ -100,7 +101,7 @@
                   <span
                     class="font-bold text-sm text-base-content leading-tight"
                   >
-                    {patient?.name || "未知"}
+                    {patient?.name || $_("schedule.unknown")}
                   </span>
                   {#if patient?.type}
                     <span
@@ -118,12 +119,16 @@
           <button
             class="w-full h-full rounded-md border border-base-200 border-dashed transition-all flex items-center justify-center relative overflow-hidden group/btn"
             on:click={() => handleSlotClick(time, null)}
-            aria-label="分配给 {time}"
+            aria-label={$_("schedule.assign_to", { values: { time } })}
           >
-            <!-- Default state: faint line -->
+            <!-- Empty Slot -->
             <div
-              class="w-full h-px bg-base-300 group-hover/btn:opacity-0 transition-opacity"
-            ></div>
+              class="w-full h-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
+            >
+              <div class="text-xs text-base-content/30 font-medium">
+                {$_("schedule.assign_to", { values: { time } })}
+              </div>
+            </div>
 
             <!-- Ghost Preview (Only if patient selected) -->
             {#if currentPatient}

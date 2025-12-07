@@ -1,40 +1,51 @@
 <script>
   import { fade, fly } from "svelte/transition";
   import { patients, schedule, showToast } from "../../lib/store";
+  import { _ } from "svelte-i18n";
 
   export let isOpen = false;
   export let onClose = () => {};
 
-  const handleExportAll = () => {
+  const handleExport = (exportType) => {
     try {
-      const data = JSON.stringify(
-        {
-          patients: $patients,
-          schedule: $schedule,
-          version: 1,
-          exportedAt: new Date().toISOString(),
-        },
-        null,
-        2,
-      );
+      let data;
+      if (exportType === "full") {
+        data = JSON.stringify(
+          {
+            patients: $patients,
+            schedule: $schedule,
+            version: 1,
+            exportedAt: new Date().toISOString(),
+          },
+          null,
+          2,
+        );
+      } else if (exportType === "patients") {
+        data = JSON.stringify($patients, null, 2);
+      } else {
+        throw new Error("Invalid export type");
+      }
+
       navigator.clipboard.writeText(data);
-      showToast("已复制完整数据(含历史记录)到剪贴板，请粘贴保存", "success");
+      if (exportType === "full") {
+        showToast($_("modal.export.copy_full_success"), "success");
+      } else {
+        showToast($_("modal.export.copy_patients_success"), "success");
+      }
       onClose();
-    } catch (e) {
-      showToast("导出失败", "error");
+    } catch (err) {
+      showToast($_("modal.export.export_failed"), "error");
     }
   };
 
-  const handleExportPatients = () => {
-    try {
-      const data = JSON.stringify($patients, null, 2);
-      navigator.clipboard.writeText(data);
-      showToast("已复制患者名单到剪贴板，请粘贴保存", "success");
-      onClose();
-    } catch (e) {
-      showToast("导出失败", "error");
-    }
-  };
+  $: types = [
+    {
+      label: $_("modal.export.full_backup"),
+      value: "full",
+      desc: $_("modal.export.full_backup_sub"),
+    },
+    { label: $_("modal.export.only_patients"), value: "patients" },
+  ];
 </script>
 
 {#if isOpen}
@@ -49,36 +60,38 @@
       class="bg-base-100 w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col"
       in:fly={{ y: 20, duration: 300 }}
     >
-      <div class="p-6 text-center">
-        <h3 class="text-lg font-bold">导出数据</h3>
-        <p class="py-4 text-base-content/70 text-sm">
-          请选择导出内容。完整备份包含患者名单和所有排班记录。
+      <div class="card-body">
+        <h2 class="card-title text-lg font-bold">{$_("modal.export.title")}</h2>
+        <p class="text-sm text-base-content/70">
+          {$_("modal.export.desc")}
         </p>
 
         <div class="flex flex-col gap-3 mt-2">
           <button
             class="btn btn-primary w-full shadow-lg shadow-primary/20"
-            on:click={handleExportAll}
+            on:click={() => handleExport(types[0].value)}
           >
             <div class="flex flex-col items-center gap-0.5">
-              <span>导出完整备份</span>
+              <span>{types[0].label}</span>
               <span class="text-[10px] opacity-70 font-normal"
-                >患者名单 + 历史记录</span
+                >{types[0].desc}</span
               >
             </div>
           </button>
 
           <button
             class="btn btn-outline w-full"
-            on:click={handleExportPatients}
+            on:click={() => handleExport(types[1].value)}
           >
-            仅导出患者名单
+            {types[1].label}
           </button>
         </div>
       </div>
 
       <div class="bg-base-50 p-3 flex justify-center border-t border-base-200">
-        <button class="btn btn-ghost btn-sm" on:click={onClose}>取消</button>
+        <button class="btn btn-ghost btn-sm" on:click={onClose}
+          >{$_("modal.common.cancel")}</button
+        >
       </div>
     </div>
   </div>

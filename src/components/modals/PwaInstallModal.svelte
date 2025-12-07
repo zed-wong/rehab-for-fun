@@ -1,6 +1,7 @@
 <script>
   export let isOpen = false;
   export let onClose = () => {};
+  import { _ } from "svelte-i18n";
 
   let activeTab = "ios";
 </script>
@@ -20,21 +21,25 @@
     >
       <div class="card-body">
         <div class="flex justify-between items-center mb-2">
-          <h2 class="card-title text-lg font-bold">安装到主屏幕</h2>
+          <h2 class="font-bold text-lg mb-4">{$_("modal.pwa.title")}</h2>
           <button class="btn btn-sm btn-circle btn-ghost" on:click={onClose}>
             ✕
           </button>
         </div>
 
-        <div class="tabs tabs-boxed mb-4">
+        <div class="tabs tabs-boxed mb-4 p-1 bg-base-200/50">
           <a
             class="tab flex-1 {activeTab === 'ios' ? 'tab-active' : ''}"
-            on:click={() => (activeTab = "ios")}>iOS (Safari)</a
+            on:click={() => (activeTab = "ios")}
           >
+            {$_("modal.pwa.ios_tab")}
+          </a>
           <a
             class="tab flex-1 {activeTab === 'android' ? 'tab-active' : ''}"
-            on:click={() => (activeTab = "android")}>Android (Chrome)</a
+            on:click={() => (activeTab = "android")}
           >
+            {$_("modal.pwa.android_tab")}
+          </a>
         </div>
 
         <div class="space-y-4 min-h-[300px]">
@@ -49,10 +54,14 @@
                 </div>
               </div>
               <div class="flex-1">
-                <p class="font-medium">在 Safari 浏览器打开</p>
-                <p class="text-sm text-base-content/70 mt-1">
-                  请确保您正在使用 iPhone 自带的 Safari 浏览器访问本页面
-                </p>
+                <div>
+                  <h3 class="font-bold text-sm">
+                    1. {$_("modal.pwa.step_1_ios")}
+                  </h3>
+                  <p class="text-xs text-base-content/70">
+                    {$_("modal.pwa.step_1_ios_desc")}
+                  </p>
+                </div>
                 <div class="mt-2 text-center p-2 bg-base-200 rounded">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -83,9 +92,9 @@
                 </div>
               </div>
               <div class="flex-1">
-                <p class="font-medium">点击 "分享" 按钮</p>
+                <p class="font-medium">{$_("modal.pwa.step_2_ios")}</p>
                 <p class="text-sm text-base-content/70 mt-1">
-                  在 Safari 浏览器底部工具栏找到分享图标
+                  {$_("modal.pwa.step_2_ios_desc")}
                 </p>
                 <div class="mt-2 text-center p-2 bg-base-200 rounded">
                   <svg
@@ -122,9 +131,9 @@
                 </div>
               </div>
               <div class="flex-1">
-                <p class="font-medium">选择 "添加到主屏幕"</p>
+                <p class="font-medium">{$_("modal.pwa.step_3_ios")}</p>
                 <p class="text-sm text-base-content/70 mt-1">
-                  向下滑动菜单找到加号图标选项
+                  {$_("modal.pwa.step_3_ios_desc")}
                 </p>
                 <div class="mt-2 text-center p-2 bg-base-200 rounded">
                   <svg
@@ -166,9 +175,9 @@
                 </div>
               </div>
               <div class="flex-1">
-                <p class="font-medium">点击 "添加"</p>
+                <p class="font-medium">{$_("modal.pwa.step_4_ios")}</p>
                 <p class="text-sm text-base-content/70 mt-1">
-                  确认名称后点击右上角的添加按钮
+                  {$_("modal.pwa.step_4_ios_desc")}
                 </p>
               </div>
             </div>
@@ -183,10 +192,14 @@
                 </div>
               </div>
               <div class="flex-1">
-                <p class="font-medium">在 Chrome 浏览器打开</p>
-                <p class="text-sm text-base-content/70 mt-1">
-                  请确保您正在使用 Chrome 浏览器访问本页面
-                </p>
+                <div>
+                  <h3 class="font-bold text-sm">
+                    1. {$_("modal.pwa.step_1_android")}
+                  </h3>
+                  <p class="text-xs text-base-content/70">
+                    {$_("modal.pwa.step_1_android_desc")}
+                  </p>
+                </div>
                 <div class="mt-2 text-center p-2 bg-base-200 rounded">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -224,9 +237,9 @@
                 </div>
               </div>
               <div class="flex-1">
-                <p class="font-medium">点击菜单图标</p>
+                <p class="font-medium">{$_("modal.pwa.step_2_android")}</p>
                 <p class="text-sm text-base-content/70 mt-1">
-                  点击右上角的三个点图标
+                  {$_("modal.pwa.step_2_android_desc")}
                 </p>
                 <div class="mt-2 text-center p-2 bg-base-200 rounded">
                   <svg
@@ -260,9 +273,9 @@
                 </div>
               </div>
               <div class="flex-1">
-                <p class="font-medium">选择 "安装应用"</p>
+                <p class="font-medium">{$_("modal.pwa.step_3_android")}</p>
                 <p class="text-sm text-base-content/70 mt-1">
-                  在菜单中找到 "安装应用" 或 "添加到主屏幕"
+                  {$_("modal.pwa.step_3_android_desc")}
                 </p>
                 <div class="mt-2 text-center p-2 bg-base-200 rounded">
                   <svg
@@ -299,9 +312,9 @@
                 </div>
               </div>
               <div class="flex-1">
-                <p class="font-medium">确认安装</p>
+                <p class="font-medium">{$_("modal.pwa.step_4_android")}</p>
                 <p class="text-sm text-base-content/70 mt-1">
-                  在弹出的对话框中点击 "安装" 或 "添加"
+                  {$_("modal.pwa.step_4_android_desc")}
                 </p>
               </div>
             </div>
@@ -321,12 +334,12 @@
               d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             ></path></svg
           >
-          <span>这样可以像原生 App 一样全屏使用，体验更好！</span>
+          <span>{$_("modal.pwa.info_alert")}</span>
         </div>
 
         <div class="card-actions justify-end mt-2">
           <button class="btn btn-primary w-full" on:click={onClose}
-            >知道了</button
+            >{$_("modal.pwa.got_it")}</button
           >
         </div>
       </div>

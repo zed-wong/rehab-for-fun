@@ -9,6 +9,8 @@
   } from "../../lib/store";
   import { createEventDispatcher, onMount } from "svelte";
   import { fade, fly } from "svelte/transition";
+  import { _ } from "svelte-i18n";
+  import { get } from "svelte/store";
 
   export let selectOnly = false;
   export let isOpen = false;
@@ -57,8 +59,7 @@
   // Export / Import Logic
   export let importMode = false;
   let importText = "";
-  const importPlaceholder = `在此处粘贴导出的 JSON 数据...
-支持仅患者和患者+记录格式`;
+  $: importPlaceholder = $_("modal.patient_list.import_placeholder");
 
   const handleExport = () => {
     dispatch("openExport"); // Let parent App.svelte handle it via ExportModal
@@ -76,7 +77,7 @@
         patientsToImport = parsed.patients;
         scheduleToImport = parsed.schedule;
       } else {
-        throw new Error("格式错误");
+        throw new Error(get(_)("import.format_error"));
       }
 
       // Basic validation
@@ -84,7 +85,7 @@
         patientsToImport.length > 0 &&
         patientsToImport.some((p) => !p.name)
       ) {
-        throw new Error("无效患者数据");
+        throw new Error($_("store.invalid_patient_data"));
       }
 
       // Import Patients
@@ -109,21 +110,26 @@
       }
 
       const count = patientsToImport.length;
-      const schMsg = scheduleToImport ? "及历史记录" : "";
-      showToast(`成功导入 ${count} 位患者${schMsg}`, "success");
+      showToast(
+        get(_)("store.import_success", {
+          count,
+          schMsg: scheduleToImport ? get(_)("import.with_history") : "",
+        }),
+        "success",
+      );
 
       importMode = false;
       importText = "";
     } catch (e) {
       console.error(e);
-      showToast("导入失败: 格式错误", "error");
+      showToast($_("store.import_failed"), "error");
     }
   };
 
   const handleClearAll = () => {
-    if (confirm("确定要清空所有患者数据吗？此操作无法撤销。")) {
+    if (confirm($_("modal.patient_list.clear_all_confirm"))) {
       clearAllPatients();
-      showToast("所有患者已清空", "success");
+      showToast($_("store.all_cleared"), "success");
     }
   };
 </script>
@@ -145,7 +151,9 @@
         class="px-5 py-4 border-b border-base-200 flex items-center justify-between bg-base-100 z-10"
       >
         <h2 class="text-lg font-bold">
-          {importMode ? "导入数据" : "选择患者"}
+          {importMode
+            ? $_("modal.patient_list.import_title")
+            : $_("modal.patient_list.title")}
         </h2>
         <div class="flex gap-2">
           {#if !importMode}
@@ -178,13 +186,19 @@
                 tabindex="0"
                 class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-32 border border-base-200"
               >
-                <li><button on:click={handleExport}>导出数据</button></li>
                 <li>
-                  <button on:click={() => (importMode = true)}>导入数据</button>
+                  <button on:click={handleExport}
+                    >{$_("modal.patient_list.export_btn")}</button
+                  >
+                </li>
+                <li>
+                  <button on:click={() => (importMode = true)}
+                    >{$_("modal.patient_list.import_btn")}</button
+                  >
                 </li>
                 <li>
                   <button on:click={handleClearAll} class="text-error"
-                    >清空所有患者</button
+                    >{$_("modal.patient_list.clear_all")}</button
                   >
                 </li>
               </ul>
@@ -208,7 +222,7 @@
             <input
               bind:this={searchInput}
               type="text"
-              placeholder="搜索姓名或诊断..."
+              placeholder={$_("modal.patient_list.search_placeholder")}
               bind:value={searchQuery}
               class="input input-sm input-bordered w-full pl-9 rounded-lg"
             />
@@ -228,14 +242,14 @@
               placeholder={importPlaceholder}
             ></textarea>
             <div class="text-xs text-base-content/50">
-              请粘贴导出的 JSON 格式数据。导入将合并或更新现有数据。
+              {$_("modal.patient_list.import_hint")}
             </div>
           </div>
         {:else if filteredPatients.length === 0}
           <div
             class="flex flex-col items-center justify-center h-full text-base-content/50 py-10"
           >
-            <p>未找到患者</p>
+            <p>{$_("modal.patient_list.not_found")}</p>
             <button
               class="btn btn-sm btn-link mt-2"
               on:click={() => {
@@ -243,7 +257,7 @@
                 onClose();
               }}
             >
-              添加新患者
+              {$_("modal.patient_list.add_new")}
             </button>
           </div>
         {:else}
@@ -267,14 +281,18 @@
                 <div class="font-medium truncate flex items-center gap-2">
                   {p.name}
                   {#if $selectedPatientId === p.id}
-                    <span class="badge badge-xs badge-primary">已选择</span>
+                    <span class="badge badge-xs badge-primary"
+                      >{$_("modal.patient_list.selected")}</span
+                    >
                   {/if}
                 </div>
                 <div class="text-xs text-base-content/60 truncate">
-                  {p.type || "无诊断"}
+                  {p.type || $_("modal.patient_list.no_diagnosis")}
                   {#if p.contact}
                     • {p.contact}{/if}
-                  • {p.duration || 30}分钟默认
+                  • {p.duration || 30}{$_("common.full_mins", {
+                    values: { m: "" },
+                  })}
                 </div>
               </div>
 
@@ -285,7 +303,9 @@
                 class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-base-300 text-base-content/70"
                 on:click={(e) => handleEdit(p, e)}
                 on:keydown={(e) => e.key === "Enter" && handleEdit(p, e)}
-                title="编辑详情"
+                title={$_("patient_palette.edit_patient", {
+                  values: { name: p.name },
+                })}
               >
                 {@html EditIcon}
               </div>
@@ -300,15 +320,20 @@
       >
         {#if importMode}
           <button class="btn btn-sm" on:click={() => (importMode = false)}
-            >取消</button
+            >{$_("modal.common.cancel")}</button
           >
           <button
             class="btn btn-sm btn-primary"
             on:click={handleImport}
-            disabled={!importText}>确认导入</button
+            disabled={!importText}
+            >{$_("modal.patient_list.confirm_import")}</button
           >
         {:else}
-          <span>共 {filteredPatients.length} 位患者</span>
+          <span
+            >{$_("modal.patient_list.total_patients", {
+              values: { count: listPatients.length },
+            })}</span
+          >
           <button
             class="btn btn-xs btn-ghost text-primary"
             on:click={() => {
@@ -316,7 +341,7 @@
               onClose();
             }}
           >
-            + 添加新患者
+            + {$_("modal.patient_list.add_new")}
           </button>
         {/if}
       </div>
