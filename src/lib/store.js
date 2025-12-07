@@ -20,8 +20,8 @@ const persist = (key, store, defaultVal) => {
 
 // --- Stores ---
 export const patients = writable([
-  { id: 'p1', name: '张伟', type: '脑卒中', duration: 30, color: 'bg-blue-500' },
-  { id: 'p2', name: '李娜', type: '骨折术后', duration: 60, color: 'bg-emerald-500' }
+  { id: 'p1', name: '张伟', type: '脑卒中', duration: 30, color: 'bg-blue-500', contact: '13812345678', frequency: '2025.12.01开始', price: 100, category: 'Inpatient' },
+  { id: 'p2', name: '李娜', type: '骨折术后', duration: 60, color: 'bg-emerald-500', contact: '13987654321', frequency: '每周三次', price: 150, category: 'Outpatient' }
 ]);
 
 export const schedule = writable({});
@@ -30,7 +30,7 @@ export const currentDate = writable(new Date().toLocaleDateString('en-CA'));
 export const toasts = writable([]);
 
 // Initialize
-persist('rehab_patients_v2', patients, []);
+persist('rehab_patients_v3', patients, []);
 persist('rehab_schedule_v2', schedule, {});
 
 // --- Toast Actions ---
