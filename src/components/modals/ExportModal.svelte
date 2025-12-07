@@ -41,7 +41,6 @@
   <div
     class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
     in:fade={{ duration: 200 }}
-    out:fade={{ duration: 150 }}
     on:click|self={onClose}
     role="dialog"
     aria-modal="true"
@@ -49,7 +48,6 @@
     <div
       class="bg-base-100 w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col"
       in:fly={{ y: 20, duration: 300 }}
-      out:fly={{ y: 20, duration: 200 }}
     >
       <div class="p-6 text-center">
         <h3 class="text-lg font-bold">导出数据</h3>

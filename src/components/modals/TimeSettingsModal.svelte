@@ -42,7 +42,7 @@
   <div class="modal modal-open z-[60]">
     <div
       class="modal-box bg-base-100 p-0 overflow-hidden max-w-sm"
-      transition:scale={{ duration: 200, start: 0.95 }}
+      in:scale={{ duration: 200, start: 0.95 }}
     >
       <!-- Header -->
       <div
@@ -115,10 +115,6 @@
         <button class="btn btn-primary" on:click={handleSave}>保存更改</button>
       </div>
     </div>
-    <div
-      class="modal-backdrop bg-black/50"
-      on:click={onClose}
-      transition:fade
-    ></div>
+    <div class="modal-backdrop bg-black/50" on:click={onClose} in:fade></div>
   </div>
 {/if}

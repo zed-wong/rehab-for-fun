@@ -64,7 +64,6 @@
   <div
     class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
     in:fade={{ duration: 200 }}
-    out:fade={{ duration: 150 }}
     on:click|self={onClose}
     on:keydown={(e) => e.key === "Escape" && onClose()}
     tabindex="-1"
@@ -74,7 +73,6 @@
     <div
       class="bg-base-100 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col h-[80vh]"
       in:fly={{ y: 20, duration: 300 }}
-      out:fly={{ y: 20, duration: 200 }}
     >
       <!-- Header -->
       <div

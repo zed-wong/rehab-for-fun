@@ -83,7 +83,6 @@
   <div
     class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
     in:fade={{ duration: 200 }}
-    out:fade={{ duration: 150 }}
     on:click|self={onClose}
     on:keydown={(e) => e.key === "Escape" && onClose()}
     tabindex="-1"
@@ -93,7 +92,6 @@
     <div
       class="bg-base-100 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
       in:fly={{ y: 20, duration: 300 }}
-      out:fly={{ y: 20, duration: 200 }}
     >
       <div
         class="px-5 py-4 border-b border-base-200 flex items-center justify-between bg-base-100 z-10"
