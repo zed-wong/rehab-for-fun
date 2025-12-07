@@ -1,5 +1,5 @@
 <script>
-  import { schedule, patients } from "../../lib/store";
+  import { schedule, patients, currentDate } from "../../lib/store";
   import { fade, fly } from "svelte/transition";
 
   export let isOpen = false;
@@ -65,9 +65,15 @@
   };
 
   // Re-calculate when open or dates change
-  $: if (isOpen) {
+  $: if (isOpen && $currentDate) {
+    endDate = $currentDate;
+    const [y, m, d] = $currentDate.split("-").map(Number);
+    const date = new Date(y, m - 1, d);
+    date.setMonth(date.getMonth() - 1);
+    startDate = date.toLocaleDateString("en-CA");
     calculate();
   }
+
   $: if (startDate || endDate) {
     if (isOpen) calculate();
   }

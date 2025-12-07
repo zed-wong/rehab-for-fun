@@ -10,6 +10,7 @@
   import TimeSettingsModal from "./components/modals/TimeSettingsModal.svelte";
   import PatientStatsModal from "./components/modals/PatientStatsModal.svelte";
   import WorkloadStatsModal from "./components/modals/WorkloadStatsModal.svelte";
+  import ExportModal from "./components/modals/ExportModal.svelte";
   import {
     toasts,
     copyYesterday,
@@ -17,7 +18,9 @@
     showToast,
     clearDay,
     patients,
+    schedule,
     clearAllPatients,
+    paintSlot,
   } from "./lib/store";
   import { fly } from "svelte/transition";
 
@@ -29,9 +32,11 @@
   let showTimeSettingsModal = false;
   let showStatsModal = false;
   let showWorkloadModal = false;
+  let showExportModal = false;
   let selectedSlotData = null;
   let editingPatientData = null;
   let listModalImportMode = false;
+  let pendingSlotTime = null;
 
   const handleOpenDetail = (e) => {
     selectedSlotData = e.detail;
@@ -46,6 +51,18 @@
   const handleEditPatient = (e) => {
     editingPatientData = e.detail;
     showPatientModal = true;
+  };
+
+  const handleGridSlotClick = (e) => {
+    pendingSlotTime = e.detail.time;
+    showListModal = true;
+  };
+
+  const handlePatientSelected = (e) => {
+    if (pendingSlotTime) {
+      paintSlot(pendingSlotTime, { patient: e.detail });
+      pendingSlotTime = null;
+    }
   };
 
   const closeSidebar = () => {
@@ -77,16 +94,7 @@
 
   const handleExportPatients = () => {
     closeSidebar();
-    try {
-      const data = JSON.stringify($patients, null, 2);
-      navigator.clipboard.writeText(data);
-      showToast(
-        "已复制患者数据到剪贴板，请将其粘贴保存，后续通过导入功能重新导入应用",
-        "success",
-      );
-    } catch (e) {
-      showToast("导出失败", "error");
-    }
+    showExportModal = true;
   };
 
   const handleImportPatients = () => {
@@ -166,7 +174,10 @@
     <main
       class="max-w-md mx-auto bg-base-100 min-h-screen shadow-xl sm:border-x border-base-200 w-full"
     >
-      <ScheduleGrid on:openDetail={handleOpenDetail} />
+      <ScheduleGrid
+        on:openDetail={handleOpenDetail}
+        on:openPatientSelect={handleGridSlotClick}
+      />
     </main>
 
     <!-- Modals -->
@@ -179,9 +190,15 @@
     <PatientListModal
       isOpen={showListModal}
       importMode={listModalImportMode}
+      selectOnly={!!pendingSlotTime}
       onClose={() => (showListModal = false)}
       on:editPatient={handleEditPatient}
       on:addNew={handleOpenAdd}
+      on:selectPatient={handlePatientSelected}
+      on:openExport={() => {
+        showListModal = false;
+        showExportModal = true;
+      }}
     />
 
     <SlotDetailModal
@@ -215,15 +232,20 @@
       onClose={() => (showWorkloadModal = false)}
     />
 
+    <ExportModal
+      isOpen={showExportModal}
+      onClose={() => (showExportModal = false)}
+    />
+
     <!-- Toast Container -->
     {#if $toasts.length > 0}
       <div
-        class="toast toast-top toast-center z-[100] w-full max-w-sm px-4 pointer-events-none"
+        class="toast toast-bottom toast-center z-[100] w-full max-w-sm px-4 pointer-events-none"
       >
         {#each $toasts as t (t.id)}
           <div
-            in:fly={{ y: -20, duration: 200 }}
-            out:fly={{ y: -20, duration: 200 }}
+            in:fly={{ y: 20, duration: 200 }}
+            out:fly={{ y: 20, duration: 200 }}
             class="alert shadow-lg border-none {t.type === 'error'
               ? 'alert-error text-white'
               : t.type === 'success'
@@ -255,15 +277,6 @@
       </li>
 
       <div class="divider"></div>
-      <li class="menu-title">设置</li>
-      <li>
-        <button on:click={handleOpenTimeSettings} class="gap-4">
-          {@html SettingsIcon}
-          时间设置
-        </button>
-      </li>
-
-      <div class="divider"></div>
       <li class="menu-title">统计分析</li>
       <li>
         <button on:click={handleOpenStats} class="gap-4">
@@ -283,19 +296,28 @@
       <li>
         <button on:click={handleExportPatients} class="gap-4">
           {@html ExportIcon}
-          导出患者数据
+          导出备份数据
         </button>
       </li>
       <li>
         <button on:click={handleImportPatients} class="gap-4">
           {@html ImportIcon}
-          导入患者数据
+          导入恢复数据
         </button>
       </li>
       <li>
         <button on:click={handleClearAllPatients} class="gap-4 text-error">
           {@html UserMinusIcon}
           清空所有患者
+        </button>
+      </li>
+
+      <div class="divider"></div>
+      <li class="menu-title">设置</li>
+      <li>
+        <button on:click={handleOpenTimeSettings} class="gap-4">
+          {@html SettingsIcon}
+          时间设置
         </button>
       </li>
 

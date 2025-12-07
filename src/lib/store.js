@@ -95,21 +95,28 @@ export const scheduleSettings = writable({
 });
 persist('rehab_settings_v1', scheduleSettings, { startHour: 7, endHour: 20, timeStep: 30 });
 
-export const paintSlot = (time) => {
-  const sPatientId = get(selectedPatientId);
-  if (!sPatientId) return showToast('请先选择一个患者', 'error');
+export const paintSlot = (time, specificDetails = null) => {
+  let patient;
+  let duration;
 
-  const allPatients = get(patients);
-  const patient = allPatients.find(p => p.id === sPatientId);
-  if (!patient) return;
+  if (specificDetails?.patient) {
+    patient = specificDetails.patient;
+    duration = specificDetails.duration || (Number(patient.duration) || 30);
+  } else {
+    const sPatientId = get(selectedPatientId);
+    if (!sPatientId) return showToast('请先选择一个患者', 'error');
 
+    const allPatients = get(patients);
+    patient = allPatients.find(p => p.id === sPatientId);
+    if (!patient) return;
+
+    duration = get(selectedDuration) || (Number(patient.duration) || 30);
+  }
+
+  const { timeStep } = get(scheduleSettings);
   const date = get(currentDate);
   const sch = get(schedule);
   const daySchedule = sch[date] || {};
-
-  // Use selectedDuration if available, otherwise patient default, otherwise 30
-  const duration = get(selectedDuration) || (Number(patient.duration) || 30);
-  const { timeStep } = get(scheduleSettings);
 
   const slotsNeeded = Math.ceil(duration / timeStep);
   const timesToReserve = [];

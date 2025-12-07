@@ -1,6 +1,7 @@
 <script>
   import {
     patients,
+    schedule,
     selectedPatientId,
     selectedDuration,
     showToast,
@@ -9,6 +10,7 @@
   import { createEventDispatcher, onMount } from "svelte";
   import { fade, fly } from "svelte/transition";
 
+  export let selectOnly = false;
   export let isOpen = false;
   export let onClose = () => {};
 
@@ -32,8 +34,11 @@
   });
 
   const selectPatient = (p) => {
-    selectedPatientId.set(p.id);
-    selectedDuration.set(p.duration || 30);
+    if (!selectOnly) {
+      selectedPatientId.set(p.id);
+      selectedDuration.set(p.duration || 30);
+    }
+    dispatch("selectPatient", p);
     onClose();
   };
 
@@ -52,56 +57,65 @@
   // Export / Import Logic
   export let importMode = false;
   let importText = "";
-  const importPlaceholder = `在此处粘贴 JSON 数据...
-[{"name": "张三", ...}]`;
+  const importPlaceholder = `在此处粘贴导出的 JSON 数据...
+支持旧版(仅患者数组)和新版(患者+记录)格式`;
 
   const handleExport = () => {
-    try {
-      const data = JSON.stringify($patients, null, 2);
-      navigator.clipboard.writeText(data);
-      showToast(
-        "已复制患者数据到剪贴板，请将其粘贴保存，后续通过导入功能重新导入应用",
-        "success",
-      );
-    } catch (e) {
-      showToast("导出失败", "error");
-    }
+    dispatch("openExport"); // Let parent App.svelte handle it via ExportModal
   };
 
   const handleImport = () => {
     try {
       const parsed = JSON.parse(importText);
-      if (!Array.isArray(parsed)) throw new Error("Format error");
+      let patientsToImport = [];
+      let scheduleToImport = null;
 
-      // Basic validation: check if items have name
-      if (parsed.some((p) => !p.name)) throw new Error("无效数据");
+      if (Array.isArray(parsed)) {
+        patientsToImport = parsed;
+      } else if (parsed.patients && Array.isArray(parsed.patients)) {
+        patientsToImport = parsed.patients;
+        scheduleToImport = parsed.schedule;
+      } else {
+        throw new Error("格式错误");
+      }
 
-      // Merge strategy: Overwrite matching IDs, append new ones.
-      // Actually, user might want to merge lists.
-      // Let's filter out incoming IDs that already exist to avoid duplicates?
-      // Or update them?
-      // Let's go with: Update existing IDs, Append new IDs.
+      // Basic validation
+      if (
+        patientsToImport.length > 0 &&
+        patientsToImport.some((p) => !p.name)
+      ) {
+        throw new Error("无效患者数据");
+      }
 
-      patients.update((current) => {
-        const currentMap = new Map(current.map((p) => [p.id, p]));
-        parsed.forEach((p) => {
-          // If ID collision, checking if it's the same patient is hard without ID.
-          // Assuming the import has IDs.
-          if (p.id) {
-            currentMap.set(p.id, p);
-          } else {
-            // No ID? create one.
-            p.id = crypto.randomUUID();
-            currentMap.set(p.id, p);
-          }
+      // Import Patients
+      if (patientsToImport.length > 0) {
+        patients.update((current) => {
+          const currentMap = new Map(current.map((p) => [p.id, p]));
+          patientsToImport.forEach((p) => {
+            if (p.id) {
+              currentMap.set(p.id, p);
+            } else {
+              p.id = crypto.randomUUID();
+              currentMap.set(p.id, p);
+            }
+          });
+          return Array.from(currentMap.values());
         });
-        return Array.from(currentMap.values());
-      });
+      }
 
-      showToast(`成功导入 ${parsed.length} 位患者`, "success");
+      // Import Schedule
+      if (scheduleToImport) {
+        schedule.update((s) => ({ ...s, ...scheduleToImport }));
+      }
+
+      const count = patientsToImport.length;
+      const schMsg = scheduleToImport ? "及历史记录" : "";
+      showToast(`成功导入 ${count} 位患者${schMsg}`, "success");
+
       importMode = false;
       importText = "";
     } catch (e) {
+      console.error(e);
       showToast("导入失败: 格式错误", "error");
     }
   };
@@ -133,7 +147,7 @@
         class="px-5 py-4 border-b border-base-200 flex items-center justify-between bg-base-100 z-10"
       >
         <h2 class="text-lg font-bold">
-          {importMode ? "导入患者" : "选择患者"}
+          {importMode ? "导入数据" : "选择患者"}
         </h2>
         <div class="flex gap-2">
           {#if !importMode}
@@ -216,7 +230,7 @@
               placeholder={importPlaceholder}
             ></textarea>
             <div class="text-xs text-base-content/50">
-              请粘贴标准的 JSON 格式数组。导入将合并或更新现有患者。
+              请粘贴导出的 JSON 格式数据。导入将合并或更新现有数据。
             </div>
           </div>
         {:else if filteredPatients.length === 0}

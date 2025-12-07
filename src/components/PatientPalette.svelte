@@ -39,7 +39,7 @@
   <div class="flex items-center gap-2 overflow-x-auto p-3 no-scrollbar snap-x">
     <!-- Add Button -->
     <button
-      class="btn btn-sm btn-circle btn-ghost border-dashed border-2 border-base-content/20 hover:border-primary hover:text-primary shrink-0 snap-start"
+      class="btn btn-sm btn-circle btn-ghost border border-base-200 text-base-content/70 hover:bg-base-200 shrink-0 snap-start"
       on:click={() => dispatch("openAddModal")}
       aria-label="添加患者"
       title="添加患者"

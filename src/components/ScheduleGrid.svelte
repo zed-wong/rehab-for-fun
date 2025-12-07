@@ -41,7 +41,12 @@
         patient: getPatient(slot.patientId),
       });
     } else {
-      paintSlot(time);
+      // If a patient is selected, assign it. Otherwise, open selection modal.
+      if ($selectedPatientId) {
+        paintSlot(time);
+      } else {
+        dispatch("openPatientSelect", { time });
+      }
     }
   };
 </script>
