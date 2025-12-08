@@ -10,6 +10,6 @@ export default {
     daisyui,
   ],
   daisyui: {
-    themes: ["winter", "light"], // Winter is a nice medical-ish blue theme
+    themes: ["winter", "light", "dark"], // Winter is a nice medical-ish blue theme
   },
 }

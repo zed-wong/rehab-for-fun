@@ -1,3 +1,4 @@
+
 import { writable, get } from 'svelte/store';
 
 // --- Data Structures ---
@@ -31,7 +32,12 @@ export const toasts = writable([]);
 
 // Initialize
 persist('rehab_patients_v3', patients, []);
+
 persist('rehab_schedule_v2', schedule, {});
+
+// Defaults: winter (light), dark (dark)
+export const theme = writable('winter');
+persist('rehab_theme_v1', theme, 'winter');
 
 // --- Toast Actions ---
 export const showToast = (message, type = 'info') => {
@@ -79,12 +85,8 @@ const addMinutes = (time, mins) => {
   const date = new Date(0, 0, 0, h, m + mins);
   const hh = date.getHours().toString().padStart(2, '0');
   const mm = date.getMinutes().toString().padStart(2, '0');
-  return `${hh}:${mm}`;
+  return `${hh}:${mm} `;
 };
-
-// ... (existing imports)
-
-// ... (existing imports)
 
 export const selectedDuration = writable(30);
 
@@ -254,4 +256,14 @@ export const clearDay = () => {
     return newSch;
   });
   showToast('本日安排已清空', 'success');
+
+};
+
+export const toggleTheme = () => {
+  theme.update(t => {
+    const next = t === 'winter' ? 'dark' : 'winter';
+    // If we had more themes, we could cycle or explicit set
+    return next;
+  });
+  showToast('主题已切换', 'success');
 };

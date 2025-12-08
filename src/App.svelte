@@ -22,6 +22,8 @@
     clearAllPatients,
     paintSlot,
     currentDate,
+    theme,
+    toggleTheme,
   } from "./lib/store";
   import { fly } from "svelte/transition";
   import { useRegisterSW } from "virtual:pwa-register/svelte";
@@ -230,14 +232,13 @@
   const TrendingUpIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg>`;
   const UpdateIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>`;
   const ClipboardIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>`;
+  const MoonIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
+  const SunIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
 </script>
 
-<div class="drawer">
+<div class="drawer" data-theme={$theme}>
   <input id="my-drawer" type="checkbox" class="drawer-toggle" />
-  <div
-    class="drawer-content flex flex-col min-h-screen bg-base-200 font-sans"
-    data-theme="winter"
-  >
+  <div class="drawer-content flex flex-col min-h-screen bg-base-200 font-sans">
     <Header />
 
     <PatientPalette
@@ -398,6 +399,12 @@
 
       <div class="divider"></div>
       <li class="menu-title">设置</li>
+      <li>
+        <button on:click={toggleTheme} class="gap-4">
+          {@html $theme === "winter" ? MoonIcon : SunIcon}
+          {$theme === "winter" ? "深色模式" : "浅色模式"}
+        </button>
+      </li>
       <li>
         <button on:click={handleOpenTimeSettings} class="gap-4">
           {@html SettingsIcon}
