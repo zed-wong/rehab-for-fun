@@ -19,11 +19,6 @@
   let searchQuery = "";
   let searchInput;
 
-  // Focus input when updated to open
-  $: if (isOpen && searchInput) {
-    setTimeout(() => searchInput.focus(), 100);
-  }
-
   $: filteredPatients = $patients.filter((p) => {
     const q = searchQuery.toLowerCase();
     return (
