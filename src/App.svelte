@@ -21,6 +21,7 @@
     schedule,
     clearAllPatients,
     paintSlot,
+    currentDate,
   } from "./lib/store";
   import { fly } from "svelte/transition";
   import { useRegisterSW } from "virtual:pwa-register/svelte";
@@ -130,6 +131,43 @@
     }, 100);
   };
 
+  const handleExportScheduleToClipboard = () => {
+    closeSidebar();
+    const date = $currentDate;
+    const daySchedule = $schedule[date];
+
+    if (!daySchedule) {
+      showToast("今日暂无安排", "warning");
+      return;
+    }
+
+    const entries = Object.entries(daySchedule)
+      .filter(([_, slot]) => slot.isHead)
+      .sort((a, b) => a[0].localeCompare(b[0]));
+
+    if (entries.length === 0) {
+      showToast("今日暂无安排", "warning");
+      return;
+    }
+
+    const lines = entries.map(([time, slot]) => {
+      const patient = $patients.find((p) => p.id === slot.patientId);
+      const name = patient ? patient.name : "未知";
+      return `${time} ${name}`;
+    });
+
+    const text = lines.join("\n");
+
+    navigator.clipboard.writeText(text).then(
+      () => {
+        showToast("已复制今日日程到剪贴板", "success");
+      },
+      () => {
+        showToast("复制失败", "error");
+      },
+    );
+  };
+
   const handleExportPatients = () => {
     closeSidebar();
     showExportModal = true;
@@ -191,6 +229,7 @@
   const ChartIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>`;
   const TrendingUpIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg>`;
   const UpdateIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>`;
+  const ClipboardIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>`;
 </script>
 
 <div class="drawer">
@@ -306,6 +345,12 @@
         <button on:click={handleCopy} class="gap-4">
           {@html CopyIcon}
           复制昨日安排
+        </button>
+      </li>
+      <li>
+        <button on:click={handleExportScheduleToClipboard} class="gap-4">
+          {@html ClipboardIcon}
+          复制日程清单
         </button>
       </li>
       <li>
