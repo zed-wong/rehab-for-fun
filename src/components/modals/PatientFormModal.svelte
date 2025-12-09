@@ -1,5 +1,10 @@
 <script>
-  import { addPatient, updatePatient, deletePatient } from "../../lib/store";
+  import {
+    addPatient,
+    updatePatient,
+    deletePatient,
+    scheduleSettings,
+  } from "../../lib/store";
 
   export let isOpen = false;
   export let patientToEdit = null; // If passed, we are editing
@@ -9,10 +14,12 @@
   let type = "";
   let duration = 30;
   let color = "bg-blue-500";
-  let category = "Inpatient"; // Default
+  let category = "Outpatient"; // Default
   let contact = "";
   let frequency = "";
   let price = 0;
+
+  $: timeStep = $scheduleSettings?.timeStep || 30;
 
   // React to opening with data
   $: if (isOpen && patientToEdit) {
@@ -77,9 +84,9 @@
   const reset = () => {
     name = "";
     type = "";
-    duration = 30;
+    duration = timeStep;
     color = "bg-blue-500";
-    category = "Inpatient";
+    category = "Outpatient";
     contact = "";
     frequency = "";
     price = 0;
@@ -201,31 +208,31 @@
           <div class="flex gap-4">
             <label
               class="label cursor-pointer gap-2 border rounded-lg px-3 py-2 flex-1 {duration ===
-              30
+              timeStep
                 ? 'border-primary bg-primary/5'
                 : ''}"
             >
               <input
                 type="radio"
                 bind:group={duration}
-                value={30}
+                value={timeStep}
                 class="radio radio-primary radio-sm"
               />
-              <span class="label-text font-medium">30 分钟</span>
+              <span class="label-text font-medium">{timeStep} 分钟</span>
             </label>
             <label
               class="label cursor-pointer gap-2 border rounded-lg px-3 py-2 flex-1 {duration ===
-              60
+              timeStep * 2
                 ? 'border-primary bg-primary/5'
                 : ''}"
             >
               <input
                 type="radio"
                 bind:group={duration}
-                value={60}
+                value={timeStep * 2}
                 class="radio radio-primary radio-sm"
               />
-              <span class="label-text font-medium">1 小时</span>
+              <span class="label-text font-medium">{timeStep * 2} 分钟</span>
             </label>
           </div>
         </div>

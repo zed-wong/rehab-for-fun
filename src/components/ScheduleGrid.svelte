@@ -74,14 +74,11 @@
         {#if slot}
           <!-- Filled Slot -->
           <button
-            class="w-full h-full rounded-md shadow-sm border border-transparent transition-all text-left relative overflow-hidden
+            class="w-full rounded-md shadow-sm border border-transparent transition-all text-left overflow-hidden bg-base-200 active:scale-[0.98]
                     {slot.duration === 60 && slot.isHead
-              ? 'rounded-b-none mb-[-1px] z-10'
-              : ''}
-                    {slot.duration === 60 && !slot.isHead
-              ? 'rounded-t-none mt-[-1px] pt-4'
-              : ''}
-                    bg-white active:scale-[0.98]"
+              ? 'absolute top-0 left-0 z-20 h-[calc(200%+0.25rem)]'
+              : 'h-full relative'}
+                    {slot.duration === 60 && !slot.isHead ? 'hidden' : ''}"
             on:click={() => handleSlotClick(time, slot)}
           >
             <!-- Color Strip -->
@@ -130,7 +127,8 @@
               <div
                 class="absolute inset-0 opacity-0 group-hover/btn:opacity-20 {currentPatient.color} transition-opacity flex items-center pl-3"
               >
-                <span class="text-xs font-bold text-black opacity-50 ml-2"
+                <span
+                  class="text-xs font-bold text-base-content opacity-50 ml-2"
                   >{currentPatient.name}</span
                 >
               </div>

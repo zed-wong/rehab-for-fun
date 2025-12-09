@@ -85,7 +85,7 @@ const addMinutes = (time, mins) => {
   const date = new Date(0, 0, 0, h, m + mins);
   const hh = date.getHours().toString().padStart(2, '0');
   const mm = date.getMinutes().toString().padStart(2, '0');
-  return `${hh}:${mm} `;
+  return `${hh}:${mm}`;
 };
 
 export const selectedDuration = writable(30);

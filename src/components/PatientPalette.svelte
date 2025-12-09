@@ -1,5 +1,10 @@
 <script>
-  import { patients, selectedPatientId, selectedDuration } from "../lib/store";
+  import {
+    patients,
+    selectedPatientId,
+    selectedDuration,
+    scheduleSettings,
+  } from "../lib/store";
   import { createEventDispatcher } from "svelte";
   import { fade } from "svelte/transition";
 
@@ -8,6 +13,8 @@
   const PlusIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>`;
   const EditIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>`;
 
+  $: timeStep = $scheduleSettings?.timeStep || 30;
+
   const selectPatient = (id) => {
     if ($selectedPatientId === id) {
       selectedPatientId.set(null);
@@ -15,13 +22,13 @@
       selectedPatientId.set(id);
       // Set initial duration based on patient default
       const p = $patients.find((x) => x.id === id);
-      if (p) selectedDuration.set(p.duration || 30);
+      if (p) selectedDuration.set(p.duration || timeStep);
     }
   };
 
   const toggleDuration = (e) => {
     e.stopPropagation();
-    selectedDuration.update((d) => (d === 60 ? 30 : 60));
+    selectedDuration.update((d) => (d === timeStep ? timeStep * 2 : timeStep));
   };
 
   const editPatient = (p, e) => {
@@ -111,13 +118,13 @@
             on:keydown={(e) => e.key === "Enter" && toggleDuration(e)}
             title="切换时长"
           >
-            {$selectedDuration === 60 ? "1小时" : "30分"}
+            {$selectedDuration === 60 ? "1小时" : $selectedDuration + "分"}
           </div>
         {:else}
           <span
             class="badge badge-sm badge-ghost bg-opacity-20 border-0 text-[10px] h-5 px-1 min-w-[2rem] justify-center"
           >
-            {p.duration === 60 ? "1小时" : "30分"}
+            {p.duration === 60 ? "1小时" : p.duration + "分"}
           </span>
         {/if}
 
