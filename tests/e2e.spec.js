@@ -278,4 +278,38 @@ test.describe('Patient Management and Scheduling', () => {
     // Verify the unarranged name is visible
     await expect(dialog.locator(`button`, { hasText: unarrangedName })).toBeVisible();
   });
+
+  test('should add a temporary patient via time block click', async ({ page }) => {
+    const tempName = `TempGuest-${Date.now()}`;
+    const targetTime = "11:00";
+
+    // 1. Click on an empty time slot
+    const slotButton = page.locator(`button[aria-label="分配给 ${targetTime}"]`);
+    await slotButton.click();
+
+    // 2. Wait for modal to appear
+    const dialog = page.locator('div[role="dialog"]');
+    await expect(dialog).toBeVisible();
+
+    // 3. Handle Prompt for Temp Patient Name
+    page.once('dialog', async dialog => {
+      await dialog.accept(tempName);
+    });
+
+    // 4. Click "Add Temporary Patient"
+    await page.click('button:has-text("+ 添加临时患者")');
+
+    // 5. Verify the slot is filled with the temp patient
+    const timeRow = page.locator('div.group', { has: page.locator(`text="${targetTime}"`) });
+    await expect(timeRow.locator(`text=${tempName}`)).toBeVisible();
+
+    // 6. Verify the temp patient is NOT in the main palette list
+    // The palette is the horizontally scrollable area at the top.
+    // We can assume if we look for a button with the text in the whole page, 
+    // it ideally appears only in the schedule grid, not in the palette area.
+    // But to be specific, let's verify it's not in the scrolling header.
+    // The palette container has "overflow-x-auto".
+    const palette = page.locator('.overflow-x-auto');
+    await expect(palette.locator(`button`, { hasText: tempName })).not.toBeVisible();
+  });
 });

@@ -21,6 +21,7 @@
   let searchInput;
 
   $: filteredPatients = $patients.filter((p) => {
+    if (p.isTemp) return false;
     const q = searchQuery.toLowerCase();
     return (
       p.name.toLowerCase().includes(q) ||
@@ -147,6 +148,14 @@
     if (confirm("确定要清空所有患者数据吗？此操作无法撤销。")) {
       clearAllPatients();
       showToast("所有患者已清空", "success");
+    }
+  };
+
+  const handleQuickAdd = () => {
+    const name = prompt("请输入临时患者姓名");
+    if (name && name.trim()) {
+      dispatch("addTemp", name.trim());
+      onClose();
     }
   };
 </script>
@@ -345,15 +354,23 @@
           >
         {:else}
           <span>共 {filteredPatients.length} 位患者</span>
-          <button
-            class="btn btn-xs btn-ghost text-primary"
-            on:click={() => {
-              dispatch("addNew");
-              onClose();
-            }}
-          >
-            + 添加新患者
-          </button>
+          <div class="flex gap-1">
+            <button
+              class="btn btn-xs btn-ghost text-primary"
+              on:click={() => {
+                dispatch("addNew");
+                onClose();
+              }}
+            >
+              + 添加新患者
+            </button>
+            <button
+              class="btn btn-xs btn-ghost text-base-content/60"
+              on:click={handleQuickAdd}
+            >
+              + 添加临时患者
+            </button>
+          </div>
         {/if}
       </div>
     </div>

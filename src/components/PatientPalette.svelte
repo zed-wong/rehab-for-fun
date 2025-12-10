@@ -93,7 +93,7 @@
     </button>
 
     <!-- Patient Chips -->
-    {#each $patients as p (p.id)}
+    {#each $patients.filter((p) => !p.isTemp) as p (p.id)}
       <button
         class="btn btn-sm rounded-full shrink-0 gap-2 normal-case font-normal transition-all snap-start group relative pr-8
           {$selectedPatientId === p.id

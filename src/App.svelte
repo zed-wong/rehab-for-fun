@@ -106,6 +106,29 @@
     }
   };
 
+  const handleTempAdd = (e) => {
+    const name = e.detail;
+    const newPatient = {
+      id: crypto.randomUUID(),
+      name,
+      type: "临时",
+      duration: 30,
+      color: "bg-gray-400",
+      isTemp: true,
+      contact: "",
+      frequency: "",
+      price: 0,
+      category: "Temporary",
+    };
+
+    patients.update((p) => [...p, newPatient]);
+
+    if (pendingSlotTime) {
+      paintSlot(pendingSlotTime, { patient: newPatient });
+      pendingSlotTime = null;
+    }
+  };
+
   const closeSidebar = () => {
     /** @type {HTMLInputElement} */ (
       document.getElementById("my-drawer")
@@ -275,6 +298,7 @@
       onClose={() => (showListModal = false)}
       on:editPatient={handleEditPatient}
       on:addNew={handleOpenAdd}
+      on:addTemp={handleTempAdd}
       on:selectPatient={handlePatientSelected}
       on:openExport={() => {
         showListModal = false;
