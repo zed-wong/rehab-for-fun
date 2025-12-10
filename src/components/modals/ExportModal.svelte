@@ -42,8 +42,10 @@
     class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
     in:fade={{ duration: 200 }}
     on:click|self={onClose}
+    on:keydown={(e) => e.key === "Escape" && onClose()}
     role="dialog"
     aria-modal="true"
+    tabindex="-1"
   >
     <div
       class="bg-base-100 w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col"

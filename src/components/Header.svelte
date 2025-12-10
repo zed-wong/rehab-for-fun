@@ -78,7 +78,7 @@
 
     <!-- Date Input -->
     <div class="relative w-[140px] sm:w-[150px]">
-      <label
+      <div
         class="input input-bordered input-sm flex items-center gap-2 w-full cursor-pointer bg-base-100 pr-0"
       >
         <span class="text-base-content/60">{@html CalendarIcon}</span>
@@ -86,14 +86,14 @@
           class="font-bold text-base-content text-sm overflow-hidden text-ellipsis whitespace-nowrap"
           >{$currentDate}</span
         >
-      </label>
+      </div>
       <input
         type="date"
         value={$currentDate}
         on:change={handleDateChange}
         on:click={(e) => {
           try {
-            e.target.showPicker();
+            /** @type {HTMLInputElement} */ (e.target).showPicker();
           } catch (error) {
             // Fallback
           }

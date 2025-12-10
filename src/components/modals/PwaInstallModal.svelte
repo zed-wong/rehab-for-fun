@@ -15,8 +15,8 @@
   >
     <div
       class="card w-full max-w-sm bg-base-100 shadow-xl"
-      on:click|stopPropagation
       role="dialog"
+      tabindex="-1"
     >
       <div class="card-body">
         <div class="flex justify-between items-center mb-2">
@@ -27,13 +27,15 @@
         </div>
 
         <div class="tabs tabs-boxed mb-4">
-          <a
+          <button
+            type="button"
             class="tab flex-1 {activeTab === 'ios' ? 'tab-active' : ''}"
-            on:click={() => (activeTab = "ios")}>iOS (Safari)</a
+            on:click={() => (activeTab = "ios")}>iOS (Safari)</button
           >
-          <a
+          <button
+            type="button"
             class="tab flex-1 {activeTab === 'android' ? 'tab-active' : ''}"
-            on:click={() => (activeTab = "android")}>Android (Chrome)</a
+            on:click={() => (activeTab = "android")}>Android (Chrome)</button
           >
         </div>
 

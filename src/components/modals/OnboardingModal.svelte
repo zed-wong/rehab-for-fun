@@ -13,8 +13,8 @@
   >
     <div
       class="card w-full max-w-lg bg-base-100 shadow-xl max-h-[90vh] overflow-y-auto"
-      on:click|stopPropagation
       role="dialog"
+      tabindex="-1"
     >
       <div class="card-body">
         <div class="flex justify-between items-center mb-2">

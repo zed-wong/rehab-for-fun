@@ -115,6 +115,14 @@
         <button class="btn btn-primary" on:click={handleSave}>保存更改</button>
       </div>
     </div>
-    <div class="modal-backdrop bg-black/50" on:click={onClose} in:fade></div>
+    <div
+      class="modal-backdrop bg-black/50"
+      on:click={onClose}
+      on:keydown={(e) => e.key === "Escape" && onClose()}
+      in:fade
+      role="button"
+      tabindex="0"
+      aria-label="Close modal"
+    ></div>
   </div>
 {/if}

@@ -3,6 +3,26 @@
   import { fade, fly } from "svelte/transition";
 
   export let isOpen = false;
+  /**
+   * @typedef {Object} Patient
+   * @property {string} name
+   * @property {string} type
+   * @property {string} color
+   */
+
+  /**
+   * @typedef {Object} Slot
+   * @property {number} duration
+   */
+
+  /**
+   * @typedef {Object} SlotData
+   * @property {string} time
+   * @property {Slot} slot
+   * @property {Patient} [patient]
+   */
+
+  /** @type {SlotData | null} */
   export let slotData = null; // { time, slot, patient }
   export let onClose = () => {};
 
@@ -21,14 +41,17 @@
     class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
     in:fade={{ duration: 200 }}
     on:click|self={onClose}
+    on:keydown={(e) => e.key === "Escape" && onClose()}
     role="dialog"
     aria-modal="true"
+    tabindex="-1"
   >
     <!-- Content -->
     <div
       class="bg-base-100 w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col"
       in:fly={{ y: 20, duration: 300 }}
-      on:click|stopPropagation
+      role="document"
+      tabindex="-1"
     >
       <!-- Header Color Strip -->
       <div class="h-2 w-full {slotData.patient?.color || 'bg-base-300'}"></div>

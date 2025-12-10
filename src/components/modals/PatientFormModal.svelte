@@ -7,6 +7,20 @@
   } from "../../lib/store";
 
   export let isOpen = false;
+  /**
+   * @typedef {Object} Patient
+   * @property {string} id
+   * @property {string} name
+   * @property {string} type
+   * @property {number} duration
+   * @property {string} color
+   * @property {string} [category]
+   * @property {string} [contact]
+   * @property {string} [frequency]
+   * @property {number} [price]
+   */
+
+  /** @type {Patient | null} */
   export let patientToEdit = null; // If passed, we are editing
   export let onClose = () => {};
 
@@ -97,13 +111,14 @@
   <div
     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
     on:click|self={onClose}
+    on:keydown={(e) => e.key === "Escape" && onClose()}
     role="button"
-    tabindex="-1"
+    tabindex="0"
   >
     <div
       class="card w-full max-w-sm bg-base-100 shadow-xl max-h-[90vh] overflow-y-auto"
-      on:click|stopPropagation
       role="dialog"
+      tabindex="-1"
     >
       <div class="card-body">
         <div class="flex justify-between items-center">
@@ -120,8 +135,11 @@
 
         <!-- Name -->
         <div class="form-control w-full">
-          <label class="label"><span class="label-text">姓名</span></label>
+          <label class="label" for="p-name"
+            ><span class="label-text">姓名</span></label
+          >
           <input
+            id="p-name"
             type="text"
             bind:value={name}
             placeholder="例如：张伟"
@@ -131,8 +149,11 @@
 
         <!-- Contact (New) -->
         <div class="form-control w-full">
-          <label class="label"><span class="label-text">联系方式</span></label>
+          <label class="label" for="p-contact"
+            ><span class="label-text">联系方式</span></label
+          >
           <input
+            id="p-contact"
             type="text"
             bind:value={contact}
             placeholder="电话号码或其他"
@@ -142,10 +163,11 @@
 
         <!-- Price (New) -->
         <div class="form-control w-full">
-          <label class="label"
+          <label class="label" for="p-price"
             ><span class="label-text">单次费用 (元)</span></label
           >
           <input
+            id="p-price"
             type="number"
             bind:value={price}
             placeholder="0"
@@ -155,8 +177,11 @@
 
         <!-- Frequency (New) -->
         <div class="form-control w-full">
-          <label class="label"><span class="label-text">日期/次数</span></label>
+          <label class="label" for="p-freq"
+            ><span class="label-text">日期/次数</span></label
+          >
           <input
+            id="p-freq"
             type="text"
             bind:value={frequency}
             placeholder="例如：2025.12.07开了10次"
@@ -166,10 +191,11 @@
 
         <!-- Diagnosis -->
         <div class="form-control w-full">
-          <label class="label"
+          <label class="label" for="p-diag"
             ><span class="label-text">诊断 / 备注</span></label
           >
           <input
+            id="p-diag"
             type="text"
             bind:value={type}
             placeholder="例如：脑卒中"
@@ -179,7 +205,7 @@
 
         <!-- Category -->
         <div class="form-control">
-          <label class="label"><span class="label-text">类别</span></label>
+          <div class="label"><span class="label-text">类别</span></div>
           <div class="flex gap-4">
             <label class="label cursor-pointer gap-2">
               <input
@@ -204,7 +230,7 @@
 
         <!-- Duration -->
         <div class="form-control">
-          <label class="label"><span class="label-text">默认时长</span></label>
+          <div class="label"><span class="label-text">默认时长</span></div>
           <div class="flex gap-4">
             <label
               class="label cursor-pointer gap-2 border rounded-lg px-3 py-2 flex-1 {duration ===
@@ -239,7 +265,7 @@
 
         <!-- Color -->
         <div class="form-control">
-          <label class="label"><span class="label-text">标签颜色</span></label>
+          <div class="label"><span class="label-text">标签颜色</span></div>
           <div class="flex gap-2 flex-wrap">
             {#each colors as c}
               <button

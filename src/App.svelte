@@ -107,7 +107,9 @@
   };
 
   const closeSidebar = () => {
-    document.getElementById("my-drawer").checked = false;
+    /** @type {HTMLInputElement} */ (
+      document.getElementById("my-drawer")
+    ).checked = false;
   };
 
   const handleCopy = () => {
