@@ -6,6 +6,7 @@
     selectedDuration,
     showToast,
     clearAllPatients,
+    currentDate,
   } from "../../lib/store";
   import { createEventDispatcher, onMount } from "svelte";
   import { fade, fly } from "svelte/transition";
@@ -27,6 +28,33 @@
       (p.contact && p.contact.toLowerCase().includes(q))
     );
   });
+
+  $: arrangedPatientIds = new Set(
+    Object.values($schedule[$currentDate] || {}).map((slot) => slot.patientId),
+  );
+
+  $: unarrangedList = filteredPatients.filter(
+    (p) => !arrangedPatientIds.has(p.id),
+  );
+  $: arrangedList = filteredPatients.filter((p) =>
+    arrangedPatientIds.has(p.id),
+  );
+
+  $: patientSections =
+    arrangedList.length > 0
+      ? [
+          {
+            title: "未安排",
+            list: unarrangedList,
+            count: unarrangedList.length,
+          },
+          {
+            title: "已安排",
+            list: arrangedList,
+            count: arrangedList.length,
+          },
+        ]
+      : [{ title: null, list: unarrangedList, count: unarrangedList.length }];
 
   const selectPatient = (p) => {
     if (!selectOnly) {
@@ -244,49 +272,60 @@
             </button>
           </div>
         {:else}
-          {#each filteredPatients as p (p.id)}
-            <button
-              class="w-full text-left flex items-center gap-3 p-3 rounded-xl hover:bg-base-200 transition-colors group relative
+          {#each patientSections as section}
+            {#if section.list.length > 0}
+              {#if section.title}
+                <div
+                  class="px-3 py-2 text-xs font-bold text-base-content/40 bg-base-200/50 sticky top-0 z-10 backdrop-blur-md"
+                >
+                  {section.title} ({section.count})
+                </div>
+              {/if}
+              {#each section.list as p (p.id)}
+                <button
+                  class="w-full text-left flex items-center gap-3 p-3 rounded-xl hover:bg-base-200 transition-colors group relative
                   {$selectedPatientId === p.id
-                ? 'bg-primary/5 border border-primary/20'
-                : ''}"
-              on:click={() => selectPatient(p)}
-            >
-              <!-- Color Indicator -->
-              <div
-                class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 {p.color} bg-opacity-20 text-xs font-bold ring-1 ring-inset ring-black/5"
-              >
-                {p.name.charAt(0)}
-              </div>
+                    ? 'bg-primary/5 border border-primary/20'
+                    : ''}"
+                  on:click={() => selectPatient(p)}
+                >
+                  <!-- Color Indicator -->
+                  <div
+                    class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 {p.color} bg-opacity-20 text-xs font-bold ring-1 ring-inset ring-black/5"
+                  >
+                    {p.name.charAt(0)}
+                  </div>
 
-              <!-- Info -->
-              <div class="flex-1 min-w-0">
-                <div class="font-medium truncate flex items-center gap-2">
-                  {p.name}
-                  {#if $selectedPatientId === p.id}
-                    <span class="badge badge-xs badge-primary">已选择</span>
-                  {/if}
-                </div>
-                <div class="text-xs text-base-content/60 truncate">
-                  {p.type || "无诊断"}
-                  {#if p.contact}
-                    • {p.contact}{/if}
-                  • {p.duration || 30}分钟默认
-                </div>
-              </div>
+                  <!-- Info -->
+                  <div class="flex-1 min-w-0">
+                    <div class="font-medium truncate flex items-center gap-2">
+                      {p.name}
+                      {#if $selectedPatientId === p.id}
+                        <span class="badge badge-xs badge-primary">已选择</span>
+                      {/if}
+                    </div>
+                    <div class="text-xs text-base-content/60 truncate">
+                      {p.type || "无诊断"}
+                      {#if p.contact}
+                        • {p.contact}{/if}
+                      • {p.duration || 30}分钟默认
+                    </div>
+                  </div>
 
-              <!-- Edit Action -->
-              <div
-                role="button"
-                tabindex="0"
-                class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-base-300 text-base-content/70"
-                on:click={(e) => handleEdit(p, e)}
-                on:keydown={(e) => e.key === "Enter" && handleEdit(p, e)}
-                title="编辑详情"
-              >
-                {@html EditIcon}
-              </div>
-            </button>
+                  <!-- Edit Action -->
+                  <div
+                    role="button"
+                    tabindex="0"
+                    class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-base-300 text-base-content/70"
+                    on:click={(e) => handleEdit(p, e)}
+                    on:keydown={(e) => e.key === "Enter" && handleEdit(p, e)}
+                    title="编辑详情"
+                  >
+                    {@html EditIcon}
+                  </div>
+                </button>
+              {/each}
+            {/if}
           {/each}
         {/if}
       </div>

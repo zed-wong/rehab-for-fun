@@ -10,7 +10,7 @@ export default defineConfig({
       registerType: 'prompt',
       includeAssets: ['icon.png'],
       manifest: {
-        name: '康复日程助手',
+        name: '康复日程',
         short_name: '康复日程',
         description: 'Rehabilitation Patient Scheduling App',
         theme_color: '#ffffff',

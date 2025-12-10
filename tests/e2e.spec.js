@@ -240,4 +240,42 @@ test.describe('Patient Management and Scheduling', () => {
     await expect(dialog.locator(`button`, { hasText: targetName })).toBeVisible();
     await expect(dialog.locator(`button`, { hasText: otherName })).not.toBeVisible();
   });
+
+  test('should split patient list into Arranged and Unarranged sections', async ({ page }) => {
+    const arrangedName = `Alice-${Date.now()}`;
+    const unarrangedName = `Bob-${Date.now()}`;
+
+    // 1. Create Arranged Patient
+    await page.click('button[title="添加患者"]');
+    await page.fill('input[placeholder="例如：张伟"]', arrangedName);
+    await page.click('button:has-text("保存")');
+
+    // 2. Create Unarranged Patient
+    await page.click('button[title="添加患者"]');
+    await page.fill('input[placeholder="例如：张伟"]', unarrangedName);
+    await page.click('button:has-text("保存")');
+
+    // 3. Arrange the first patient at 08:00
+    // Select patient
+    const arrangedBtn = page.locator(`button`, { hasText: arrangedName }).first();
+    await arrangedBtn.click();
+
+    // Click slot
+    const slot0800 = page.locator(`button[aria-label="分配给 08:00"]`);
+    await slot0800.click();
+
+    // 4. Open the Patient List Modal
+    await page.click('button[title="搜索 / 查看所有"]');
+    const dialog = page.locator('div[role="dialog"]');
+
+    // 5. Verify Headers
+    // Note: The headers include counts, so we match partial text
+    await expect(dialog.locator('text=已安排')).toBeVisible();
+    await expect(dialog.locator('text=未安排')).toBeVisible();
+
+    // Verify the arranged name is visible
+    await expect(dialog.locator(`button`, { hasText: arrangedName })).toBeVisible();
+    // Verify the unarranged name is visible
+    await expect(dialog.locator(`button`, { hasText: unarrangedName })).toBeVisible();
+  });
 });
