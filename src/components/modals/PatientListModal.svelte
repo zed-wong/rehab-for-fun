@@ -1,6 +1,7 @@
 <script>
   import {
     patients,
+    archivedPatients,
     schedule,
     selectedPatientId,
     selectedDuration,
@@ -92,12 +93,16 @@
     try {
       const parsed = JSON.parse(importText);
       let patientsToImport = [];
+      let archivedToImport = [];
       let scheduleToImport = null;
 
       if (Array.isArray(parsed)) {
         patientsToImport = parsed;
       } else if (parsed.patients && Array.isArray(parsed.patients)) {
         patientsToImport = parsed.patients;
+        if (parsed.archivedPatients && Array.isArray(parsed.archivedPatients)) {
+          archivedToImport = parsed.archivedPatients;
+        }
         scheduleToImport = parsed.schedule;
       } else {
         throw new Error("格式错误");
@@ -127,14 +132,33 @@
         });
       }
 
+      // Import Archived Patients
+      if (archivedToImport.length > 0) {
+        archivedPatients.update((current) => {
+          const currentMap = new Map(current.map((p) => [p.id, p]));
+          archivedToImport.forEach((p) => {
+            if (p.id) {
+              currentMap.set(p.id, p);
+            } else {
+              p.id = crypto.randomUUID(); // Should rare for archived but safe
+              currentMap.set(p.id, p);
+            }
+          });
+          return Array.from(currentMap.values());
+        });
+      }
+
       // Import Schedule
       if (scheduleToImport) {
         schedule.update((s) => ({ ...s, ...scheduleToImport }));
       }
 
       const count = patientsToImport.length;
+      const archivedCount = archivedToImport.length;
       const schMsg = scheduleToImport ? "及历史记录" : "";
-      showToast(`成功导入 ${count} 位患者${schMsg}`, "success");
+      const archivedMsg = archivedCount > 0 ? `及 ${archivedCount} 位归档` : "";
+
+      showToast(`成功导入 ${count} 位患者${archivedMsg}${schMsg}`, "success");
 
       importMode = false;
       importText = "";

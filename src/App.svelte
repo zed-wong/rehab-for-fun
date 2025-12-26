@@ -11,6 +11,7 @@
   import PatientStatsModal from "./components/modals/PatientStatsModal.svelte";
   import WorkloadStatsModal from "./components/modals/WorkloadStatsModal.svelte";
   import ExportModal from "./components/modals/ExportModal.svelte";
+  import ArchiveModal from "./components/modals/ArchiveModal.svelte";
   import {
     toasts,
     copyYesterday,
@@ -18,6 +19,7 @@
     showToast,
     clearDay,
     patients,
+    archivedPatients,
     schedule,
     clearAllPatients,
     paintSlot,
@@ -74,6 +76,7 @@
   let showStatsModal = false;
   let showWorkloadModal = false;
   let showExportModal = false;
+  let showArchiveModal = false;
   let selectedSlotData = null;
   let editingPatientData = null;
   let listModalImportMode = false;
@@ -178,7 +181,10 @@
     }
 
     const lines = entries.map(([time, slot]) => {
-      const patient = $patients.find((p) => p.id === slot.patientId);
+      let patient = $patients.find((p) => p.id === slot.patientId);
+      if (!patient) {
+        patient = $archivedPatients.find((p) => p.id === slot.patientId);
+      }
       const name = patient ? patient.name : "未知";
       return `${time} ${name}`;
     });
@@ -244,6 +250,11 @@
     showWorkloadModal = true;
   };
 
+  const handleOpenArchive = () => {
+    closeSidebar();
+    showArchiveModal = true;
+  };
+
   // Icons for Sidebar
   const CopyIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`;
   const TrashIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>`;
@@ -257,6 +268,7 @@
   const TrendingUpIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg>`;
   const UpdateIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>`;
   const ClipboardIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>`;
+  const ArchiveIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>`;
   const MoonIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
   const SunIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
 </script>
@@ -342,6 +354,11 @@
       onClose={() => (showExportModal = false)}
     />
 
+    <ArchiveModal
+      isOpen={showArchiveModal}
+      onClose={() => (showArchiveModal = false)}
+    />
+
     <!-- Toast Container -->
     {#if $toasts.length > 0}
       <div
@@ -414,6 +431,12 @@
         <button on:click={handleImportPatients} class="gap-4">
           {@html ImportIcon}
           导入恢复数据
+        </button>
+      </li>
+      <li>
+        <button on:click={handleOpenArchive} class="gap-4">
+          {@html ArchiveIcon}
+          归档管理
         </button>
       </li>
       <li>

@@ -89,7 +89,11 @@
   };
 
   const handleDelete = () => {
-    if (confirm("确定要永久删除此患者吗？")) {
+    if (
+      confirm(
+        "确定要归档此患者吗？\n\n归档后患者将不会出现在安排列表中，但可以在归档管理中恢复。",
+      )
+    ) {
       deletePatient(patientToEdit.id);
       onClose();
     }
@@ -127,8 +131,8 @@
           </h2>
           {#if patientToEdit}
             <button
-              class="btn btn-xs btn-outline btn-error"
-              on:click={handleDelete}>删除</button
+              class="btn btn-xs btn-outline btn-warning"
+              on:click={handleDelete}>归档</button
             >
           {/if}
         </div>

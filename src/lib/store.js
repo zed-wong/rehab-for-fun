@@ -25,6 +25,7 @@ export const patients = writable([
   { id: 'p2', name: '李娜', type: '骨折术后', duration: 60, color: 'bg-emerald-500', contact: '13987654321', frequency: '2025.12.11开了5次', price: 400, category: 'Outpatient' }
 ]);
 
+export const archivedPatients = writable([]);
 export const schedule = writable({});
 export const selectedPatientId = writable(null);
 export const currentDate = writable(new Date().toLocaleDateString('en-CA'));
@@ -32,6 +33,7 @@ export const toasts = writable([]);
 
 // Initialize
 persist('rehab_patients_v3', patients, []);
+persist('rehab_archived_patients_v1', archivedPatients, []);
 
 persist('rehab_schedule_v2', schedule, {});
 
@@ -66,13 +68,35 @@ export const updatePatient = (id, updates) => {
 };
 
 export const deletePatient = (id) => {
-  patients.update(list => list.filter(p => p.id !== id));
-  selectedPatientId.update(curr => curr === id ? null : curr);
-  showToast('患者已删除', 'warning');
+  // Archive the patient instead of deleting
+  const patient = get(patients).find(p => p.id === id);
+  if (patient) {
+    archivedPatients.update(list => [...list, { ...patient, archivedAt: new Date().toISOString() }]);
+    patients.update(list => list.filter(p => p.id !== id));
+    selectedPatientId.update(curr => curr === id ? null : curr);
+    showToast('患者已归档', 'info');
+  }
+};
+
+export const recoverPatient = (id) => {
+  const archived = get(archivedPatients).find(p => p.id === id);
+  if (archived) {
+    // Remove archivedAt timestamp when recovering
+    const { archivedAt, ...patientData } = archived;
+    patients.update(list => [...list, patientData]);
+    archivedPatients.update(list => list.filter(p => p.id !== id));
+    showToast('患者已恢复', 'success');
+  }
+};
+
+export const permanentlyDeletePatient = (id) => {
+  archivedPatients.update(list => list.filter(p => p.id !== id));
+  showToast('患者已永久删除', 'warning');
 };
 
 export const clearAllPatients = () => {
   patients.set([]);
+  archivedPatients.set([]);
   selectedPatientId.set(null);
   showToast('所有患者已清空', 'warning');
 };

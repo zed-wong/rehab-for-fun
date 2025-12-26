@@ -3,6 +3,7 @@
     schedule,
     currentDate,
     patients,
+    archivedPatients,
     selectedPatientId,
     paintSlot,
     scheduleSettings,
@@ -31,7 +32,12 @@
   $: daySchedule = $schedule[$currentDate] || {};
   $: currentPatient = $patients.find((p) => p.id === $selectedPatientId);
 
-  const getPatient = (id) => $patients.find((p) => p.id === id);
+  // Look for patient in both active and archived lists
+  const getPatient = (id) => {
+    const active = $patients.find((p) => p.id === id);
+    if (active) return active;
+    return $archivedPatients.find((p) => p.id === id);
+  };
 
   const handleSlotClick = (time, slot) => {
     if (slot) {

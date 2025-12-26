@@ -1,6 +1,11 @@
 <script>
   import { fade, fly } from "svelte/transition";
-  import { patients, schedule, showToast } from "../../lib/store";
+  import {
+    patients,
+    archivedPatients,
+    schedule,
+    showToast,
+  } from "../../lib/store";
 
   export let isOpen = false;
   export let onClose = () => {};
@@ -10,6 +15,7 @@
       const data = JSON.stringify(
         {
           patients: $patients,
+          archivedPatients: $archivedPatients,
           schedule: $schedule,
           version: 1,
           exportedAt: new Date().toISOString(),
@@ -65,7 +71,7 @@
             <div class="flex flex-col items-center gap-0.5">
               <span>导出完整备份</span>
               <span class="text-[10px] opacity-70 font-normal"
-                >患者名单 + 历史记录</span
+                >患者名单 + 归档数据 + 历史记录</span
               >
             </div>
           </button>
